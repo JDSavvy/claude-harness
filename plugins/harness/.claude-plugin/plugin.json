@@ -1,0 +1,12 @@
+{
+  "name": "harness",
+  "description": "Canonical, stack-agnostic Claude Code harness: the /spec skill (goal -> researched GitHub issue ready for @claude) plus generic code-reviewer and test-runner subagents. Shared across all of JDSavvy's repos; each project tailors stack-specific bits (build/test commands, anti-mixing guard ref, app skills) locally.",
+  "version": "1.0.0",
+  "author": {
+    "name": "JDSavvy",
+    "email": "jdsavvy@proton.me"
+  },
+  "repository": "https://github.com/JDSavvy/claude-harness",
+  "category": "development",
+  "keywords": ["harness", "spec", "github", "claude-code-action", "workflow", "review"]
+}
