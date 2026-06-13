@@ -9,10 +9,10 @@
   "plugins": [
     {
       "name": "harness",
-      "description": "Canonical, stack-agnostic harness: the /spec skill (goal -> researched GitHub issue ready for @claude) plus generic code-reviewer and test-runner subagents.",
+      "description": "Canonical, stack-agnostic harness: the /spec skill (goal -> researched GitHub issue ready for @claude) and the /reconcile-pr skill (detect drift, re-align & implement a stale PR), plus generic code-reviewer and test-runner subagents.",
       "author": { "name": "JDSavvy" },
       "category": "development",
-      "version": "1.0.2",
+      "version": "1.1.0",
       "source": {
         "source": "git-subdir",
         "url": "https://github.com/JDSavvy/claude-harness.git",
