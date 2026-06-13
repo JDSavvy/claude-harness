@@ -60,6 +60,7 @@ Compose a complete spec and create it with `gh issue create` (use `--label` if s
 - [ ] <verifiable outcome>
 - [ ] <…>
 - [ ] Tests added/updated per CLAUDE.md conventions
+- [ ] All the repo's quality gates pass (lint, typecheck, format, unit/e2e — whatever CLAUDE.md / the package scripts define)
 
 ## Scope
 - In: <areas/files>
@@ -74,6 +75,12 @@ Compose a complete spec and create it with `gh issue create` (use `--label` if s
 
 ## Verification
 - <how to prove it works: the repo's real build/test/lint commands, manual steps>
+
+## Engineering rules
+- General solution — implement for all valid inputs; do not hard-code to the tests.
+- **Never weaken, skip, or delete tests** to go green — fix the cause.
+- No over-engineering — build exactly this scope; no speculative abstractions.
+- Read the referenced files before asserting anything about them.
 
 ---
 Ready for autonomous implementation — the owner starts it with the hand-off comment printed after creation.
