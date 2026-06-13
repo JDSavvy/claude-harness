@@ -76,14 +76,18 @@ Compose a complete spec and create it with `gh issue create` (use `--label` if s
 - <how to prove it works: the repo's real build/test/lint commands, manual steps>
 
 ---
-Ready for autonomous implementation. Comment `@claude` on this issue to start.
+Ready for autonomous implementation — the owner starts it with the hand-off comment printed after creation.
 ```
 
 ### 6. Hand off
 Print the created issue URL and the exact comment to paste (`@claude implement this per the spec and
-CLAUDE.md; open a PR with tests`). Do not implement.
+CLAUDE.md; open a PR with tests`). The issue **body** itself stays `@claude`-free (see Guardrails) — the
+manual comment is the trigger, so the owner reviews the spec first. Do not implement.
 
 ## Guardrails
+- **Never put the literal `@claude` in the issue BODY.** Repos commonly fire the action on `@claude` in
+  `issues.opened`, so a body mention auto-starts implementation *before* the owner reviews the spec —
+  defeating the spec-first intent. The trigger is the manual hand-off COMMENT (step 6), posted after review.
 - **Spec only** — zero code/file edits beyond creating the issue.
 - **Lean & honest** — concise spec; cite sources; mark unverified claims; don't pad.
 - Requires `gh` (authenticated) and network for research.
