@@ -12,7 +12,7 @@
       "description": "Canonical, stack-agnostic harness: the /spec skill (goal -> researched GitHub issue ready for @claude) plus generic code-reviewer and test-runner subagents.",
       "author": { "name": "JDSavvy" },
       "category": "development",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "source": {
         "source": "git-subdir",
         "url": "https://github.com/JDSavvy/claude-harness.git",
