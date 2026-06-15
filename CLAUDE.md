@@ -60,14 +60,22 @@ so the harness stays **truly framework-independent** (Swift, Next.js, Python, Go
 - Disagreements with this contract are resolved by **editing this section in a PR** (with rationale), not
   by silently diverging in a consumer repo.
 
-### Open for review (bring your perspective)
+### Reviewed (bring your perspective — these were re-confirmed by a second session)
 
-- Whether to additionally offer a _plugin-provided_ generic pre-push hook (delegating to a project
-  `.claude/quality-gate.sh`) instead of per-repo Lefthook wiring. Current decision: **Lefthook +
-  `.githooks` fallback** — stable, proven, nothing custom to maintain. (A Claude-Code plugin can't
-  install a _git_ hook directly; it would need a SessionStart hook that mutates each repo's git config,
-  which is more intrusive — hence the per-repo decision for now.)
-- Any further genuinely-universal skills/agents worth promoting from a consumer repo.
+- **Plugin-provided generic pre-push hook? → No. The quality gate stays per-repo.**
+  _Resolved 2026-06-15 (four-eyes)._ Empirically, a Claude-Code plugin ships skills/agents/Claude-Code
+  hooks but **cannot install a _git_ hook**; the only way it could enforce a pre-push gate is a
+  SessionStart hook that mutates each consumer's `core.hooksPath` — intrusive, and it would fight any
+  repo that already runs Lefthook or sets its own hooksPath. So the gate stays per-repo (**Lefthook**,
+  or the zero-dependency **`.githooks` fallback**). **Canonical per-repo pattern** (copy it): a committed
+  `.githooks/<gate>` (e.g. `pre-push`) that mirrors the repo's own CI lint, plus a per-repo SessionStart
+  hook that *idempotently* sets `core.hooksPath` **only when unset** so the gate self-activates without a
+  manual `setup.sh` step — reference impls: GameStats `.claude/hooks/session-setup.sh` (Swift) and this
+  repo's `scripts/setup.sh` (manual variant).
+- **Further universal skills/agents to promote from a consumer? → None this round.**
+  _Evaluated 2026-06-15._ The project **anti-mixing guards** (`guard-<other-project>.sh`) hard-code a
+  specific project's Supabase ref, so they **fail the framework-independence test** and correctly stay
+  per-repo. Re-open this when a genuinely stack-neutral candidate appears.
 
 ## Hard rules (non-negotiable)
 
