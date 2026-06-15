@@ -1,1 +1,14 @@
+# Build artifacts
 docs/*.pdf
+
+# Secrets / local env — never commit (repo-local, not relying on the owner's global gitignore)
+.env
+.env.*
+!.env.example
+
+# Machine-local Claude Code settings
+**/settings.local.json
+
+# Dependencies & OS cruft
+node_modules/
+.DS_Store
