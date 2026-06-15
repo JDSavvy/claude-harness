@@ -77,8 +77,14 @@ are _prompted_ to install on folder-trust:
 ```
 
 > This **prompts** on folder-trust — it is not a silent auto-install (Claude Code security design).
-> `autoUpdate: true` lets Claude Code refresh the marketplace + plugin at startup; the update-check hook
-> is the belt-and-suspenders signal regardless.
+>
+> ⚠️ **Trust implication of `autoUpdate: true`:** it refreshes the marketplace **and plugin** from the
+> mutable `main` branch at every session start — each start runs whatever `main` currently is (including
+> its SessionStart hooks) before you can review it. That is only safe if you fully trust this repo and the
+> owner account. For higher-privileged consumers — especially CI runners holding tokens — prefer
+> **`autoUpdate: false`** and update deliberately via `/plugin marketplace update claude-harness`, so a
+> human stays between a push and its execution. The update-check hook is the belt-and-suspenders signal
+> either way.
 
 **Autonomous @claude GitHub Action** — add to the repo's `claude.yml` / `claude-code-review.yml`
 (verified inputs of `anthropics/claude-code-action`, as of 2026-06-15):
