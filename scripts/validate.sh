@@ -4,7 +4,7 @@
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)"
-cd "$ROOT"
+cd "$ROOT" || exit 1
 fail=0
 ok() { printf '  \033[32m✓\033[0m %s\n' "$1"; }
 no() {
@@ -53,6 +53,74 @@ fi
 
 # 6) Hook behavior tests (the git-sync hook mutates state → regression-protected).
 if bash tests/git-sync.test.sh >/dev/null 2>&1; then ok "hook tests — tests/git-sync.test.sh"; else no "hook tests FAILED (run: bash tests/git-sync.test.sh)"; fi
+
+# 7) Skill + agent frontmatter (name + NON-EMPTY description). Runs without the `claude` CLI — which
+#    only WARNS on a missing description (exit 0) and never checks it when absent. A skill/agent with a
+#    blank description degrades triggering in EVERY consumer, so we hard-fail here. (python3 = already
+#    a gate dependency, used above for JSON.)
+fm_reason() { # $1=file -> prints "" on ok, or a reason; exit 1 on fail
+  python3 - "$1" <<'PY'
+import sys, re
+p = sys.argv[1]
+t = open(p, encoding="utf-8").read()
+if not t.startswith("---"):
+    print("no frontmatter"); sys.exit(1)
+end = t.find("\n---", 3)
+if end < 0:
+    print("unterminated frontmatter"); sys.exit(1)
+lines = t[3:end].splitlines()
+def has(key):
+    for i, l in enumerate(lines):
+        m = re.match(r"^" + key + r":\s*(.*)$", l)
+        if not m:
+            continue
+        val = m.group(1).strip()
+        if val and val not in (">", ">-", ">+", "|", "|-", "|+"):
+            return True  # inline value
+        for nl in lines[i + 1:]:        # block scalar / empty inline -> need an indented continuation
+            if nl.strip() == "":
+                continue
+            return bool(nl[:1] in (" ", "\t"))
+        return False
+    return False
+missing = [k for k in ("name", "description") if not has(k)]
+if missing:
+    print("missing/empty: " + ", ".join(missing)); sys.exit(1)
+sys.exit(0)
+PY
+}
+while IFS= read -r f; do
+  r="$(fm_reason "$f" 2>&1)" && ok "frontmatter — ${f#plugins/harness/}" || no "frontmatter — ${f#plugins/harness/} ($r)"
+done < <({ find plugins/harness/skills -name 'SKILL.md'; find plugins/harness/agents -name '*.md'; } | sort)
+
+# 8) hooks.json referential integrity: every ${CLAUDE_PLUGIN_ROOT}/… script it points to must exist.
+#    A typo'd path silently no-ops in every consumer's session, and `claude plugin validate` does not
+#    flag it. (Empirically verified 2026-06-15.)
+while IFS= read -r rel; do
+  [ -n "$rel" ] || continue
+  if [ -f "plugins/harness/$rel" ]; then ok "hook ref exists — $rel"; else
+    no "hooks.json references MISSING script — plugins/harness/$rel"
+  fi
+done < <(python3 - <<'PY'
+import json, re
+d = json.load(open("plugins/harness/hooks/hooks.json"))
+seen = []
+def walk(o):
+    if isinstance(o, dict):
+        for k, v in o.items():
+            if k == "command" and isinstance(v, str):
+                for m in re.findall(r"\$\{CLAUDE_PLUGIN_ROOT\}/([^\s\"']+)", v):
+                    if m not in seen:
+                        seen.append(m)
+            else:
+                walk(v)
+    elif isinstance(o, list):
+        for x in o:
+            walk(x)
+walk(d)
+print("\n".join(seen))
+PY
+)
 
 if [ "$fail" -eq 0 ]; then
   printf '\033[32mvalidate: ALL GREEN\033[0m\n'
