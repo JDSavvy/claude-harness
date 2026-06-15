@@ -44,9 +44,11 @@ so the harness stays **truly framework-independent** (Swift, Next.js, Python, Go
 - **Quality gate → per-repo, LOCAL, zero GitHub compute.** No CI/build/test workflows in Actions.
   **Recommended implementation: Lefthook** (language-agnostic Go binary) — each repo supplies its own
   `lefthook.yml` commands and installs it its own way. **Zero-dependency fallback** (repos without a
-  package manager, like this one): a committed `.githooks/` dir + `git config core.hooksPath .githooks`
-  (see `scripts/setup.sh`). Either way the gate runs on **pre-push**, is `--no-verify`-bypassable, and
-  never runs in CI.
+  package manager, like this one): a committed `.githooks/` dir + `git config core.hooksPath .githooks`.
+  Wire that fallback either **manually, once per clone** (`scripts/setup.sh` — sets `core.hooksPath`
+  **unconditionally**) or have it **self-activate** via a per-repo SessionStart hook that sets
+  `core.hooksPath` **only when unset** (the canonical auto pattern — see **Reviewed** below). Either way
+  the gate runs on **pre-push**, is `--no-verify`-bypassable, and never runs in CI.
 - **GitHub stays review-only.** Keep `@claude` / Claude-PR-Review workflows if a project wants them; no
   build/test compute in Actions.
 
@@ -68,10 +70,14 @@ so the harness stays **truly framework-independent** (Swift, Next.js, Python, Go
   SessionStart hook that mutates each consumer's `core.hooksPath` — intrusive, and it would fight any
   repo that already runs Lefthook or sets its own hooksPath. So the gate stays per-repo (**Lefthook**,
   or the zero-dependency **`.githooks` fallback**). **Canonical per-repo pattern** (copy it): a committed
-  `.githooks/<gate>` (e.g. `pre-push`) that mirrors the repo's own CI lint, plus a per-repo SessionStart
-  hook that *idempotently* sets `core.hooksPath` **only when unset** so the gate self-activates without a
-  manual `setup.sh` step — reference impls: GameStats `.claude/hooks/session-setup.sh` (Swift) and this
-  repo's `scripts/setup.sh` (manual variant).
+  `.githooks/<gate>` (e.g. `pre-push`) that mirrors the repo's own CI lint, enabled one of two ways —
+  **(1) auto, recommended:** a per-repo SessionStart hook that sets `core.hooksPath` **only when unset**
+  (idempotent; never clobbers a repo that already runs Lefthook or set its own hooksPath), so it
+  self-activates every session with no manual step — reference impl: GameStats
+  `.claude/hooks/session-setup.sh` (Swift); **(2) manual:** a one-shot `scripts/setup.sh` that sets
+  `core.hooksPath` **unconditionally**, run once per clone — this repo's variant. The only-when-unset
+  guard is exactly what makes (1) safe to run on every session start; do **not** port the manual
+  one-shot's unconditional `config` into a SessionStart hook.
 - **Further universal skills/agents to promote from a consumer? → None this round.**
   _Evaluated 2026-06-15._ The project **anti-mixing guards** (`guard-<other-project>.sh`) hard-code a
   specific project's Supabase ref, so they **fail the framework-independence test** and correctly stay
