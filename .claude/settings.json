@@ -1,0 +1,14 @@
+{
+  "extraKnownMarketplaces": {
+    "claude-harness": {
+      "source": {
+        "source": "git",
+        "url": "https://github.com/JDSavvy/claude-harness.git"
+      },
+      "autoUpdate": true
+    }
+  },
+  "enabledPlugins": {
+    "harness@claude-harness": true
+  }
+}
