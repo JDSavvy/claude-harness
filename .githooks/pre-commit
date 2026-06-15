@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Local quality gate for claude-harness — runs the self-validation before every commit.
+# Enable once per clone:  bash scripts/setup.sh   (or: git config core.hooksPath .githooks)
+# Emergency bypass:        git commit --no-verify
+exec "$(git rev-parse --show-toplevel)/scripts/validate.sh"
