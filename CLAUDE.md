@@ -97,6 +97,18 @@ so the harness stays **truly framework-independent** (Swift, Next.js, Python, Go
 5. **Lean / scope-fence.** Add only what genuinely serves every repo. **No GitHub CI compute** (cost) —
    quality runs locally. No deps, no build step; keep the repo a thin, auditable set of text files.
 
+## Anti-hallucination (universal)
+
+**Verify before asserting — including negative claims.** Before stating any fact — and
+**especially any absence/negative claim** ("X doesn't exist", "that tool/skill/file is
+missing", "not installed", "there's no such option") — validate it against the **live
+source of truth** (filesystem, `--version` / the package registry, MCP introspection, an
+actual invocation), never from memory. **An in-context list or summary is not a source of
+truth** — it can be incomplete (e.g. a loaded skill/tool list may omit plugin-provided
+skills). When unsure, verify rather than guess; if something genuinely cannot be verified,
+say so explicitly instead of inventing it. This applies to every consuming repo, regardless
+of stack.
+
 ## How to extend
 
 - **New skill:** `plugins/harness/skills/<name>/SKILL.md` (frontmatter `name` + `description`). Keep it generic.
