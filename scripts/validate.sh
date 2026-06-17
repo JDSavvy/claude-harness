@@ -58,8 +58,11 @@ else
   skip "claude CLI not installed — skipped"
 fi
 
-# 6) Hook behavior tests (the git-sync hook mutates state → regression-protected).
-if bash tests/git-sync.test.sh >/dev/null 2>&1; then ok "hook tests — tests/git-sync.test.sh"; else no "hook tests FAILED (run: bash tests/git-sync.test.sh)"; fi
+# 6) Hook behavior tests — every tests/*.test.sh (auto-discovered, so new hooks stay regression-protected).
+while IFS= read -r t; do
+  [ -n "$t" ] || continue
+  if bash "$t" >/dev/null 2>&1; then ok "hook tests — $t"; else no "hook tests FAILED (run: bash $t)"; fi
+done < <(find tests -name '*.test.sh' 2>/dev/null | sort)
 
 # 7) Skill + agent frontmatter (name + NON-EMPTY description). Runs without the `claude` CLI — which
 #    only WARNS on a missing description (exit 0) and never checks it when absent. A skill/agent with a

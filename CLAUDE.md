@@ -28,8 +28,9 @@ so the harness stays **truly framework-independent** (Swift, Next.js, Python, Go
 ### Two layers
 
 1. **Universal core — the plugin (`plugins/harness/`), one copy per machine.** Pure git/workflow logic,
-   zero stack assumptions: `session-git-sync`, `harness-update-check`, `/spec`, `/implement-pr`,
-   `/release-harness`, and the generic `code-reviewer` + `test-runner` (which read each repo's CLAUDE.md).
+   zero stack assumptions: `session-git-sync`, `harness-update-check`, `anti-hallucination-reminder`,
+   `/spec`, `/implement-pr`, `/release-harness`, and the generic `code-reviewer` + `test-runner` (which
+   read each repo's CLAUDE.md).
 2. **Stack adapter — each project's committed `.claude/` (its "subharness").** Everything stack-specific:
    formatter, linter, dependency install, the quality-gate _commands_, project skills, specialized
    subagents, and the project `CLAUDE.md`.
@@ -108,6 +109,11 @@ truth** — it can be incomplete (e.g. a loaded skill/tool list may omit plugin-
 skills). When unsure, verify rather than guess; if something genuinely cannot be verified,
 say so explicitly instead of inventing it. This applies to every consuming repo, regardless
 of stack.
+
+This rule is not just documentation: the plugin ships it into **every** consumer session via the
+`anti-hallucination-reminder.sh` SessionStart hook (emitted as `hookSpecificOutput.additionalContext`,
+matchers `startup|resume|clear|compact`), so it survives even in repos whose own `CLAUDE.md` never
+restates it. Stack-agnostic and I/O-free. Opt-out: `HARNESS_AH_REMINDER=off`.
 
 ## How to extend
 
