@@ -5,6 +5,13 @@ set -uo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)"
 cd "$ROOT" || exit 1
+
+# Invoked from .githooks/pre-commit, git exports the repo-local env vars (GIT_DIR, GIT_INDEX_FILE,
+# GIT_WORK_TREE, GIT_COMMON_DIR, GIT_OBJECT_DIRECTORY, …). Clear the complete, git-defined set so
+# the git-based behavior tests below run against their own temp fixtures, never the real repo.
+# shellcheck disable=SC2046  # intentional word-split: each name becomes its own unset arg
+unset $(git rev-parse --local-env-vars 2>/dev/null)
+
 fail=0
 ok() { printf '  \033[32m✓\033[0m %s\n' "$1"; }
 no() {

@@ -3,6 +3,14 @@
 # Builds throwaway git repos under a temp dir (left in /tmp; harmless). No network, no external services.
 set -u
 
+# Hermetic: a git hook (e.g. .githooks/pre-commit) exports the repo-local env vars (GIT_DIR,
+# GIT_INDEX_FILE, GIT_WORK_TREE, GIT_COMMON_DIR, GIT_OBJECT_DIRECTORY, …) into its children.
+# `git -C <dir>` does NOT override those, so they would redirect this test's git commands onto
+# the REAL repo and corrupt it (stray branches, reset HEAD, polluted config). Drop the complete,
+# git-defined set up front so every git call below resolves only its own temp fixtures.
+# shellcheck disable=SC2046  # intentional word-split: each name becomes its own unset arg
+unset $(git rev-parse --local-env-vars 2>/dev/null)
+
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)"
 HOOK="$ROOT/plugins/harness/hooks/session-git-sync.sh"
 T="$(mktemp -d "${TMPDIR:-/tmp}/git-sync-test.XXXXXX")"
