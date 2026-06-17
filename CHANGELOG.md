@@ -4,6 +4,24 @@ All notable changes to the `harness` plugin. Versions track
 `plugins/harness/.claude-plugin/plugin.json` (the single source of truth). Loosely follows
 [Keep a Changelog]; the repo uses Conventional Commits.
 
+## 1.3.0 — 2026-06-17
+
+### Added
+
+- **`anti-hallucination-reminder.sh`** — a generic `SessionStart` hook that injects the universal
+  anti-hallucination rule ("verify before asserting — including negative/absence claims; an in-context
+  list/summary is NOT a source of truth; verify against the live source of truth or say so") into
+  **every** consumer session as context (`hookSpecificOutput.additionalContext`, matchers
+  `startup|resume|clear|compact`). So the rule now flows automatically into repos whose own `CLAUDE.md`
+  never restates it. Stack-agnostic, no I/O, no network, always exits 0. Opt-out: `HARNESS_AH_REMINDER=off`.
+- `tests/anti-hallucination-reminder.test.sh` — behavior test (reminder present + valid JSON; opt-out
+  suppresses it; exit 0).
+
+### Changed
+
+- `scripts/validate.sh` now auto-discovers and runs **every** `tests/*.test.sh`, so new hook tests are
+  gated without editing the validator.
+
 ## 1.2.0 — 2026-06-15
 
 ### Added
