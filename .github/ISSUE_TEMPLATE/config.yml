@@ -1,4 +1,6 @@
-blank_issues_enabled: false
+# Blank issues stay enabled as a guaranteed fallback for anything the two forms don't cover
+# (the Discussions link below only resolves once Discussions is enabled in repo settings).
+blank_issues_enabled: true
 contact_links:
   - name: Questions & ideas (Discussions)
     url: https://github.com/JDSavvy/claude-harness/discussions
