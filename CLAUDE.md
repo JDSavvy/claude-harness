@@ -150,3 +150,8 @@ bash scripts/setup.sh            # or: git config core.hooksPath .githooks
 ```
 
 Bypass a single local commit in an emergency with `git commit --no-verify` (CI still runs).
+
+`main` is branch-protected: the `validate` check is **required** and force-push/deletion are blocked.
+`enforce_admins` is intentionally **off** so the solo maintainer is never locked out — a deliberate
+trade-off (an admin *can* merge without a second reviewer; the four-eyes protocol above stays the norm).
+Actions are SHA-pinned (with version comments) and kept current by Dependabot.
