@@ -1,11 +1,11 @@
 {
   "name": "harness",
-  "description": "Canonical, stack-agnostic Claude Code harness: the /spec skill (goal -> researched GitHub issue ready for @claude) and the /implement-pr skill (drive a mentioned PR to done — reconcile against drift as a pre-step, then implement & fix it merge-ready), plus generic code-reviewer and test-runner subagents. Shared across all of JDSavvy's repos; each project tailors stack-specific bits (build/test commands, anti-mixing guard ref, app skills) locally.",
+  "description": "Canonical, stack-agnostic Claude Code harness: the /create-issue skill (goal → researched GitHub issue) and the /finish-pr skill (drive a PR to merge-ready — reconcile against drift, then implement & fix it), plus generic code-reviewer and test-runner subagents and SessionStart automation. Reusable across any repo; each project tailors its stack-specific bits (build/test commands, project guards, app skills) locally.",
   "version": "1.2.0",
   "author": {
     "name": "JDSavvy",
     "email": "jdsavvy@proton.me"
   },
   "repository": "https://github.com/JDSavvy/claude-harness",
-  "keywords": ["harness", "spec", "github", "claude-code-action", "workflow", "review"]
+  "keywords": ["harness", "claude-code", "plugin", "github", "issue", "pull-request", "workflow", "code-review"]
 }

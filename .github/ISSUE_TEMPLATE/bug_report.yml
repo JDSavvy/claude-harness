@@ -1,0 +1,88 @@
+name: Bug report
+description: Something in the harness plugin (a skill, hook, subagent, or the gate) misbehaves.
+title: "bug: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. This repo is the shared, **Claude-Code-only**, stack-agnostic harness — a fix
+        here propagates to every consuming project, so concrete repro detail saves a lot of round-trips.
+
+        Before filing, please confirm the issue is in the **plugin** (universal git/workflow logic) and not in
+        your repo's own `.claude/` stack adapter (formatter, linter, build/test gate, project skills).
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: A clear, concrete description of the misbehavior.
+      placeholder: e.g. session-git-sync.sh fast-forwarded a worktree that had uncommitted changes.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: The exact sequence — commands, the repo state, what you ran.
+      placeholder: |
+        1. Enable the plugin in a clean repo via .claude/settings.json
+        2. Start a session with the working tree dirty
+        3. Observe ...
+      value: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+  - type: textarea
+    id: expected-actual
+    attributes:
+      label: Expected vs. actual
+      description: What you expected to happen, and what actually happened.
+      placeholder: |
+        Expected: hook notifies but never mutates a dirty tree.
+        Actual: hook ran `merge --ff-only` and ...
+    validations:
+      required: true
+  - type: dropdown
+    id: element
+    attributes:
+      label: Which element
+      description: The part of the harness that misbehaves.
+      options:
+        - "Skill: /create-issue"
+        - "Skill: /finish-pr"
+        - "Hook: session-git-sync"
+        - "Hook: harness-update-check"
+        - "Hook: anti-hallucination-reminder"
+        - "Subagent: code-reviewer"
+        - "Subagent: test-runner"
+        - "Quality gate: scripts/validate.sh / .githooks"
+        - "Docs"
+        - "Other / not sure"
+    validations:
+      required: true
+  - type: input
+    id: claude-code-version
+    attributes:
+      label: Claude Code version
+      description: Output of `claude --version`.
+      placeholder: e.g. 1.0.x
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment (OS + shell)
+      description: Operating system and shell. Hooks must be portable to macOS bash 3.2.
+      placeholder: e.g. macOS 15.5, zsh 5.9 (hook runs under /bin/bash 3.2)
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs / output
+      description: Hook output, error text, or gate output. Redact any secrets.
+      render: shell
+    validations:
+      required: false

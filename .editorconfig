@@ -1,0 +1,26 @@
+# EditorConfig — https://editorconfig.org
+# Root config for claude-harness. Stop scanning parent directories here.
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Shell hooks/scripts: 2-space indent (matches the repo's existing style).
+[*.{sh,bash}]
+indent_style = space
+indent_size = 2
+
+[*.{json,yml,yaml,md}]
+indent_style = space
+indent_size = 2
+
+# Markdown: keep trailing whitespace — two trailing spaces are a hard line break.
+[*.md]
+trim_trailing_whitespace = false
+
+# Makefiles require literal tabs for recipe lines.
+[Makefile]
+indent_style = tab

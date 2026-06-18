@@ -1,27 +1,29 @@
 ---
-name: implement-pr
+name: finish-pr
 description: >-
-  Take a pull request that's mentioned with this skill and drive it to a merge-ready, done state —
-  implement and fix whatever it needs. Use when you want Claude to actually BUILD/COMPLETE a PR, not just
-  inspect it — e.g. "implement this PR", "/implement-pr", "finish this PR", "take this PR and make it done",
-  "address & fix this PR", "@claude implement this PR", "nimm dir diesen PR vor und setze ihn um", "PR fertig
-  implementieren", "PR umsetzen/beheben". As a built-in PRE-STEP it first reconciles the PR against drift
-  (base-branch drift/conflicts, a changed linked issue/spec, changed related APIs/code outside the PR,
-  failing CI + open review threads) by MERGING base into the PR branch (never rebasing a published PR) — so
-  the work is built on current ground — and only THEN implements the PR's intent to completion, re-verifies
-  against the repo's quality gate, and pushes ONCE. Autonomous (no confirm gate) with hard stop-and-flag
-  guardrails. Stack-agnostic: reads the repo's CLAUDE.md. NEVER pushes to the default branch.
+  Take a pull request and drive it to a merge-ready, done state — implement and fix whatever it needs.
+  Use when you want Claude to actually BUILD/COMPLETE a PR, not just inspect it — e.g. "finish this PR",
+  "/finish-pr", "complete this PR", "take this PR and make it done", "address & fix this PR", "nimm dir
+  diesen PR vor und setze ihn um", "PR fertig implementieren", "PR umsetzen/beheben". As a built-in
+  PRE-STEP it first reconciles the PR against drift (base-branch drift/conflicts, a changed linked
+  issue/spec, changed related APIs/code outside the PR, failing CI + open review threads) by MERGING
+  base into the PR branch (never rebasing a published PR) — so the work is built on current ground — and
+  only THEN implements the PR's intent to completion, re-verifies against the repo's quality gate, and
+  pushes ONCE. Autonomous (no confirm gate) with hard stop-and-flag guardrails. Stack-agnostic: reads
+  the repo's CLAUDE.md. NEVER pushes to the default branch.
+argument-hint: "<PR#>"
 ---
 
-# implement-pr — bring a mentioned PR to done (reconcile first, then implement)
+# finish-pr — bring a PR to done (reconcile first, then implement)
 
 **Primary job:** given one PR (named with this skill), **implement and fix it until it fully delivers its
 intent and is merge-ready**. Re-aligning the PR against drift is the necessary **pre-step (preflight)**, not
 the goal — you do it first so you build on the current state of the world, then you do the real work: finish
 the implementation, make CI green, resolve review threads.
 
-Runs identically **locally** (`/harness:implement-pr <PR#>`) and **via the `@claude` GitHub Action** (comment
-naming this skill), so the sequence below is the one canonical order on both surfaces.
+Runs the same wherever the plugin is loaded — locally (`/harness:finish-pr <PR#>`) or via any agent
+surface that can act on the repo (e.g. a GitHub Action). The sequence below is the one canonical order
+on every surface.
 
 Owner chose **implement-directly (no confirm gate)** — reconcile and implement without asking, BUT the
 **Stop-and-flag** rules are hard guardrails. Autonomous ≠ reckless.
@@ -37,7 +39,7 @@ Owner chose **implement-directly (no confirm gate)** — reconcile and implement
 ## Procedure
 
 ### 1. Understand what "done" means for this PR
-Resolve the target PR (argument / the `@claude` PR context / ask if ambiguous). Read its title + body, the
+Resolve the target PR (argument / the current PR context / ask if ambiguous). Read its title + body, the
 linked issue/spec, and the repo's `CLAUDE.md`:
 ```
 gh pr view <PR#> --json number,headRefName,baseRefName,headRefOid,mergeable,mergeStateStatus,\
@@ -86,14 +88,14 @@ implemented, CI/verify status, and anything still open.
 - `mergeStateStatus`/`mergeable` is `UNKNOWN`/`null` (GitHub still computing) — **re-poll**, don't guess.
 - Required context (the linked issue, a CI log) **can't be read**.
 
-## Run it on both surfaces
-- **Locally (macOS):** `/harness:implement-pr <PR#>`.
-- **Via `@claude` (phone/web ok):** comment on the PR, naming the skill, e.g.
-  `@claude run the harness:implement-pr skill on this PR`. The action loads the plugin, so this is the same
-  skill and the same sequence — only the trigger surface differs.
+## Surfaces
+Runs anywhere the plugin is loaded — there is no surface-specific logic:
+- **Locally:** `/harness:finish-pr <PR#>`.
+- **Via an automation surface** (e.g. a GitHub Action that loads the plugin): trigger it however that
+  surface expects; it's the same skill and the same sequence — only the trigger differs.
 
 ## Guardrails
 - Stack-agnostic: do detection with shell `git`/`gh`; defer verification to the repo's `CLAUDE.md` gate.
-- The `@claude` action can push commits and reply to reviews but has **no built-in rebase/conflict engine** —
-  drive every git/gh step explicitly here.
+- Don't assume the runtime has a rebase/conflict engine — drive every git/gh step explicitly here, so the
+  skill behaves the same on a bare automation surface as it does locally.
 - Requires `gh` (authenticated) and a checkout of the repo with `origin` set.

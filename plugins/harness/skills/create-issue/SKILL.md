@@ -1,27 +1,28 @@
 ---
-name: spec
+name: create-issue
 description: >-
-  Turn a declared goal into a research-backed, current-best-practice GitHub issue spec that is ready
-  for @claude to implement autonomously. Use when the user wants to declare/plan a task, feature, fix,
-  or change and have a clean spec/issue prepared (NOT implemented yet) — e.g. "spec out X", "/spec",
-  "/spec-it", "create a task/issue/PR for X", "plan X for @claude", "draft an implementation brief",
-  "erstelle eine Spec", "Task/Implementierungs-Spec vorbereiten", "ich will X umsetzen". Fetches today's
-  date, researches the latest best practices for the requirement (pins versions empirically), asks ONLY
-  the questions that genuinely need the owner (the rest is decided from research + the codebase), then
-  writes a complete GitHub issue. Makes NO code changes — never touches the working tree, branches, or
-  opens a PR. Stack-agnostic: it reads the repo's CLAUDE.md to ground itself in that project.
+  Turn a declared goal into a research-backed, current-best-practice GitHub issue — a clean, complete
+  spec ready to implement however you later choose to pick it up. Use when the user wants to declare or
+  plan a task, feature, fix, or change and have the issue prepared (NOT implemented yet) — e.g. "create
+  an issue for X", "/create-issue", "draft an implementation brief", "plan X", "spec out X", "erstelle
+  ein Issue / eine Spec", "Task/Implementierungs-Spec vorbereiten", "ich will X umsetzen". Fetches
+  today's date, researches the latest best practices for the requirement (pins versions empirically),
+  asks ONLY the questions that genuinely need the owner (the rest is decided from research + the
+  codebase), then writes a complete GitHub issue. Makes NO code changes — never touches the working
+  tree, branches, or opens a PR. Stack-agnostic: it reads the repo's CLAUDE.md to ground itself.
+argument-hint: "<goal>"
 ---
 
-# spec — Goal → researched, BP-current GitHub issue (ready for @claude)
+# create-issue — Goal → researched, BP-current GitHub issue
 
-Turn the user's declared goal into one complete, detailed **GitHub issue** that `@claude` can later
-implement autonomously. **This skill never edits code, never opens a branch, never implements** — its
-only artifact is the issue. It is project-neutral: it grounds itself in the current repo's `CLAUDE.md`
-and conventions, whatever the stack.
+Turn the user's declared goal into one complete, detailed **GitHub issue**. **This skill never edits
+code, never opens a branch, never implements** — its only artifact is the issue. It is project-neutral:
+it grounds itself in the current repo's `CLAUDE.md` and conventions, whatever the stack.
 
-Why an issue (not a PR): an issue declares *what* to build. After it exists, the user comments
-**`@claude`** on it; the Claude GitHub Action reads the issue **and `CLAUDE.md`**, then opens an
-implementation PR.
+An issue declares *what* to build and *why*. **How** it gets implemented afterwards is entirely the
+owner's choice — implement it yourself, run `/harness:finish-pr` on a PR, mention an automation bot on
+the issue, or anything else. That decision is out of scope here, so this skill makes no assumption about
+it: it produces a reviewable spec and stops.
 
 ## Procedure
 
@@ -81,20 +82,17 @@ Compose a complete spec and create it with `gh issue create` (use `--label` if s
 - **Never weaken, skip, or delete tests** to go green — fix the cause.
 - No over-engineering — build exactly this scope; no speculative abstractions.
 - Read the referenced files before asserting anything about them.
-
----
-Ready for autonomous implementation — the owner starts it with the hand-off comment printed after creation.
 ```
 
 ### 6. Hand off
-Print the created issue URL and the exact comment to paste (`@claude implement this per the spec and
-CLAUDE.md; open a PR with tests`). The issue **body** itself stays `@claude`-free (see Guardrails) — the
-manual comment is the trigger, so the owner reviews the spec first. Do not implement.
+Print the created issue URL and a one-line summary of what it covers. **Do not implement** — the spec is
+the deliverable; picking it up is the owner's call.
 
 ## Guardrails
-- **Never put the literal `@claude` in the issue BODY.** Repos commonly fire the action on `@claude` in
-  `issues.opened`, so a body mention auto-starts implementation *before* the owner reviews the spec —
-  defeating the spec-first intent. The trigger is the manual hand-off COMMENT (step 6), posted after review.
 - **Spec only** — zero code/file edits beyond creating the issue.
+- **Keep the issue review-first** — don't embed an auto-trigger mention (e.g. an automation bot's
+  keyword) in the issue *body*; many repos fire an action on such mentions in `issues.opened`, which
+  would start implementation before the spec is reviewed. If the owner wants automation, they add the
+  trigger themselves after review.
 - **Lean & honest** — concise spec; cite sources; mark unverified claims; don't pad.
 - Requires `gh` (authenticated) and network for research.

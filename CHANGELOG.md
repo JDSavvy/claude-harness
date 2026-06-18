@@ -4,6 +4,40 @@ All notable changes to the `harness` plugin. Versions track
 `plugins/harness/.claude-plugin/plugin.json` (the single source of truth). Loosely follows
 [Keep a Changelog]; the repo uses Conventional Commits.
 
+## [Unreleased]
+
+The next release — a **major** bump, since the skill renames are breaking for consumers. It is cut
+automatically by `release-please` from the Conventional Commits on `main`; this section is the
+human-readable preview until then.
+
+### Added
+
+- **`anti-hallucination-reminder.sh`** SessionStart hook — injects the universal "verify before
+  asserting, including negative/absence claims; an in-context list is not a source of truth" rule into
+  every consumer session (`hookSpecificOutput.additionalContext`). Opt-out: `HARNESS_AH_REMINDER=off`.
+- **Free CI** (`.github/workflows/ci.yml`) running the same `scripts/validate.sh` gate on every push/PR,
+  and **automated releases** via `release-please` (`.github/workflows/release.yml`; the version stays
+  single-sourced in `plugin.json`).
+- Repo hygiene: `LICENSE` (MIT), `CONTRIBUTING.md`, `SECURITY.md`, `.editorconfig`, issue/PR templates,
+  `CODEOWNERS`, Dependabot, and a rewritten `README.md` with badges + an inventory table.
+- `scripts/validate.sh` now auto-discovers every `tests/*.test.sh` and parses the release-please JSON.
+- Behavior-test coverage now spans **all four** plugin shell files — added hermetic tests for
+  `harness-update-check.sh` (throttle, `ls-remote` behind-detection, notify-only) and `lib/common.sh`
+  (`json_str` escaping, `emit_context` JSON shape, `run_with_timeout` watchdog).
+
+### Changed (BREAKING)
+
+- Renamed skills: **`/spec` → `/create-issue`** and **`/implement-pr` → `/finish-pr`**, both decoupled
+  from any specific implementation surface (no `@claude` assumptions). Update references to the old names.
+- Genericized the harness to be fully project-neutral (removed all project-specific examples) and refined
+  the contract: the "no GitHub CI compute" rule applies to *consumer* repos, while this public marketplace
+  repo uses its own free read-only CI.
+
+### Removed (BREAKING)
+
+- **`/release-harness`** skill — releasing the plugin is now automated via `release-please`, so it is no
+  longer a maintainer-only skill cluttering every consumer's skill list.
+
 ## 1.2.0 — 2026-06-15
 
 ### Added

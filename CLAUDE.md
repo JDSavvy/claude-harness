@@ -1,6 +1,6 @@
 # CLAUDE.md — claude-harness
 
-The shared, **stack-agnostic, Claude-Code-only** harness reused by every JDSavvy repo. This file grounds
+The shared, **stack-agnostic, Claude-Code-only** harness reusable across any repo. This file grounds
 any work done **on this repo**. The plugin here propagates to **every** consuming project, so changes are
 **high blast radius** — treat them with care and validate before committing.
 
@@ -28,8 +28,10 @@ so the harness stays **truly framework-independent** (Swift, Next.js, Python, Go
 ### Two layers
 
 1. **Universal core — the plugin (`plugins/harness/`), one copy per machine.** Pure git/workflow logic,
-   zero stack assumptions: `session-git-sync`, `harness-update-check`, `/spec`, `/implement-pr`,
-   `/release-harness`, and the generic `code-reviewer` + `test-runner` (which read each repo's CLAUDE.md).
+   zero stack assumptions: `session-git-sync`, `harness-update-check`, `anti-hallucination-reminder`,
+   `/create-issue`, `/finish-pr`, and the generic `code-reviewer` + `test-runner` (which read each repo's
+   CLAUDE.md). Releasing *this* plugin is deliberately **not** here — it's maintainer-only automation (see
+   *How to extend*), so it never pollutes a consumer's skill list.
 2. **Stack adapter — each project's committed `.claude/` (its "subharness").** Everything stack-specific:
    formatter, linter, dependency install, the quality-gate _commands_, project skills, specialized
    subagents, and the project `CLAUDE.md`.
@@ -41,16 +43,22 @@ so the harness stays **truly framework-independent** (Swift, Next.js, Python, Go
   `.claude/settings.json` bootstrap (`extraKnownMarketplaces` + `enabledPlugins` + `autoUpdate`).
 - **Dependency install → per-repo.** A Node repo ships `.claude/hooks/session-deps-install.sh` (pnpm); a
   Swift repo would `swift package resolve`. Never hardcode a package manager in the plugin.
-- **Quality gate → per-repo, LOCAL, zero GitHub compute.** No CI/build/test workflows in Actions.
-  **Recommended implementation: Lefthook** (language-agnostic Go binary) — each repo supplies its own
-  `lefthook.yml` commands and installs it its own way. **Zero-dependency fallback** (repos without a
-  package manager, like this one): a committed `.githooks/` dir + `git config core.hooksPath .githooks`.
-  Wire that fallback either **manually, once per clone** (`scripts/setup.sh` — sets `core.hooksPath`
-  **unconditionally**) or have it **self-activate** via a per-repo SessionStart hook that sets
-  `core.hooksPath` **only when unset** (the canonical auto pattern — see **Reviewed** below). Either way
-  the gate runs on **pre-push**, is `--no-verify`-bypassable, and never runs in CI.
-- **GitHub stays review-only.** Keep `@claude` / Claude-PR-Review workflows if a project wants them; no
-  build/test compute in Actions.
+- **Consumer quality gate → per-repo, LOCAL, zero GitHub compute.** A *consumer* repo must not pay for
+  build/test minutes in Actions — its gate runs locally. **Recommended implementation: Lefthook**
+  (language-agnostic Go binary) — each repo supplies its own `lefthook.yml` commands and installs it its
+  own way. **Zero-dependency fallback** (repos without a package manager, like this one): a committed
+  `.githooks/` dir + `git config core.hooksPath .githooks`. Wire that fallback either **manually, once
+  per clone** (`scripts/setup.sh` — sets `core.hooksPath` **unconditionally**) or have it
+  **self-activate** via a per-repo SessionStart hook that sets `core.hooksPath` **only when unset** (the
+  canonical auto pattern — see **Reviewed** below). Either way the gate runs on **pre-push** and is
+  `--no-verify`-bypassable.
+- **GitHub stays review-only for consumers.** Keep `@claude` / Claude-PR-Review workflows if a project
+  wants them; no build/test compute in a *consumer's* Actions.
+- **This public marketplace repo is the deliberate exception.** Public repos get **free** GitHub Actions
+  minutes, so *this* repo runs the same `scripts/validate.sh` gate in CI (read-only, no build/deploy) and
+  automates its own releases with `release-please`. That imposes **zero** cost on any consumer and keeps
+  the high-blast-radius plugin honest on every PR. This free-CI carve-out is **only** for this repo —
+  never a pattern pushed onto consumers.
 
 ### Four-eyes / parallel-evolution protocol
 
@@ -73,20 +81,20 @@ so the harness stays **truly framework-independent** (Swift, Next.js, Python, Go
   `.githooks/<gate>` (e.g. `pre-push`) that mirrors the repo's own CI lint, enabled one of two ways —
   **(1) auto, recommended:** a per-repo SessionStart hook that sets `core.hooksPath` **only when unset**
   (idempotent; never clobbers a repo that already runs Lefthook or set its own hooksPath), so it
-  self-activates every session with no manual step — reference impl: GameStats
-  `.claude/hooks/session-setup.sh` (Swift); **(2) manual:** a one-shot `scripts/setup.sh` that sets
+  self-activates every session with no manual step — e.g. a Swift consumer's
+  `.claude/hooks/session-setup.sh`; **(2) manual:** a one-shot `scripts/setup.sh` that sets
   `core.hooksPath` **unconditionally**, run once per clone — this repo's variant. The only-when-unset
   guard is exactly what makes (1) safe to run on every session start; do **not** port the manual
   one-shot's unconditional `config` into a SessionStart hook.
 - **Further universal skills/agents to promote from a consumer? → None this round.**
-  _Evaluated 2026-06-15._ The project **anti-mixing guards** (`guard-<other-project>.sh`) hard-code a
-  specific project's Supabase ref, so they **fail the framework-independence test** and correctly stay
-  per-repo. Re-open this when a genuinely stack-neutral candidate appears.
+  _Evaluated 2026-06-15._ A consumer's **anti-mixing guards** (`guard-<other-project>.sh`) hard-code a
+  specific project's backend/service ref, so they **fail the framework-independence test** and correctly
+  stay per-repo. Re-open this when a genuinely stack-neutral candidate appears.
 
 ## Hard rules (non-negotiable)
 
-1. **Stay stack-agnostic.** No project/language/framework assumptions (no pnpm/Next/Supabase/etc.) in any
-   skill, agent, or hook. Project-specific logic lives in each consumer's `.claude/` — never here.
+1. **Stay stack-agnostic.** No project/language/framework assumptions (no `pnpm`/Next/`tsc`/`pip`/etc.) in
+   any skill, agent, or hook. Project-specific logic lives in each consumer's `.claude/` — never here.
 2. **Version is single-sourced** in `plugins/harness/.claude-plugin/plugin.json`. **Never** add `version`
    to the marketplace entry — Claude Code lets `plugin.json` win and the two silently drift.
 3. **Hooks must be safe in every repo:** offline-safe, worktree-safe, fast, **always `exit 0`**, never
@@ -94,8 +102,10 @@ so the harness stays **truly framework-independent** (Swift, Next.js, Python, Go
    macOS **bash 3.2** (no `timeout`/`gtimeout`, no `jq`).
 4. **Validate before commit.** Run `bash scripts/validate.sh` (wired as a pre-commit hook — see below).
    Never commit a hook that fails the gate; it breaks every repo.
-5. **Lean / scope-fence.** Add only what genuinely serves every repo. **No GitHub CI compute** (cost) —
-   quality runs locally. No deps, no build step; keep the repo a thin, auditable set of text files.
+5. **Lean / scope-fence.** Add only what genuinely serves every repo. **No GitHub CI compute is imposed on
+   consumer repos** (cost) — their quality runs locally; *this* public repo's own free read-only CI is the
+   sole, deliberate exception (see the element rulings). No deps, no build step; keep the repo a thin,
+   auditable set of text files.
 
 ## Anti-hallucination (universal)
 
@@ -109,24 +119,34 @@ skills). When unsure, verify rather than guess; if something genuinely cannot be
 say so explicitly instead of inventing it. This applies to every consuming repo, regardless
 of stack.
 
+This rule is not just documentation: the plugin ships it into **every** consumer session via the
+`anti-hallucination-reminder.sh` SessionStart hook (emitted as `hookSpecificOutput.additionalContext`,
+matchers `startup|resume|clear|compact`), so it survives even in repos whose own `CLAUDE.md` never
+restates it. Stack-agnostic and I/O-free. Opt-out: `HARNESS_AH_REMINDER=off`.
+
 ## How to extend
 
 - **New skill:** `plugins/harness/skills/<name>/SKILL.md` (frontmatter `name` + `description`). Keep it generic.
 - **New subagent:** `plugins/harness/agents/<name>.md`.
 - **New hook:** add a script under `plugins/harness/hooks/`, register it in `hooks/hooks.json`, give it an
   opt-out env var + a watchdog if it does I/O, and add a behavior test under `tests/`.
-- After any meaningful change, cut a release with **`/release-harness`** (validate → bump `plugin.json` →
-  update `CHANGELOG.md` → Conventional Commit + tag). Consumers pick it up via `autoUpdate` or
-  `/plugin marketplace update claude-harness`.
+- **Releasing is automated and maintainer-only — not a propagated skill.** Land changes via
+  **Conventional Commits**; on merge to `main`, **`release-please`** opens a release PR (computes the
+  SemVer bump, updates `CHANGELOG.md`, and on merge tags + cuts a GitHub Release). The version stays
+  single-sourced in `plugin.json` (release-please updates it there). Consumers pick the release up via
+  `autoUpdate` or `/plugin marketplace update claude-harness`. See `CONTRIBUTING.md` for the flow.
 
-## Quality gate (local, zero GitHub cost)
+## Quality gate
 
 `bash scripts/validate.sh` checks: JSON manifests parse · version is single-sourced · `bash -n` on every
-hook · `shellcheck` (if installed) · `claude plugin validate` (if installed) · the hook behavior tests in
-`tests/`. It is wired as a git **pre-commit** via `.githooks/`. **Enable once per clone:**
+hook · `shellcheck` (if installed) · `claude plugin validate` (if installed) · skill/agent frontmatter ·
+`hooks.json` referential integrity · every `tests/*.test.sh`. It runs in **two places, identically**: as a
+local git **pre-commit** (via `.githooks/`) and in **CI on every push/PR** (free for this public repo, so
+a contributor who skips the local hook still can't merge a red gate). **Enable the local hook once per
+clone:**
 
 ```
 bash scripts/setup.sh            # or: git config core.hooksPath .githooks
 ```
 
-Bypass a single commit in an emergency with `git commit --no-verify`.
+Bypass a single local commit in an emergency with `git commit --no-verify` (CI still runs).

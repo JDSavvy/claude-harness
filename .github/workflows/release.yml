@@ -1,0 +1,23 @@
+name: release-please
+
+# Conventional Commits on main drive the version bump (feat! / BREAKING CHANGE -> major).
+# release-please opens/maintains a release PR; merging it tags + cuts the GitHub Release.
+# The version is single-sourced in plugins/harness/.claude-plugin/plugin.json via the
+# extra-files JSON updater in release-please-config.json — no other version file exists.
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: googleapis/release-please-action@v4
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
