@@ -1,11 +1,20 @@
 {
   "name": "harness",
   "description": "Canonical, stack-agnostic Claude Code harness: the /create-issue skill (goal → researched GitHub issue) and the /finish-pr skill (drive a PR to merge-ready — reconcile against drift, then implement & fix it), plus generic code-reviewer and test-runner subagents and SessionStart automation. Reusable across any repo; each project tailors its stack-specific bits (build/test commands, project guards, app skills) locally.",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "author": {
     "name": "JDSavvy",
     "email": "jdsavvy@proton.me"
   },
   "repository": "https://github.com/JDSavvy/claude-harness",
-  "keywords": ["harness", "claude-code", "plugin", "github", "issue", "pull-request", "workflow", "code-review"]
+  "keywords": [
+    "harness",
+    "claude-code",
+    "plugin",
+    "github",
+    "issue",
+    "pull-request",
+    "workflow",
+    "code-review"
+  ]
 }
