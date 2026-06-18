@@ -4,6 +4,17 @@ All notable changes to the `harness` plugin. Versions track
 `plugins/harness/.claude-plugin/plugin.json` (the single source of truth). Loosely follows
 [Keep a Changelog]; the repo uses Conventional Commits.
 
+## [2.0.0](https://github.com/JDSavvy/claude-harness/compare/harness-v1.2.0...harness-v2.0.0) (2026-06-18)
+
+
+### ⚠ BREAKING CHANGES
+
+* skill names changed (/spec -> /create-issue, /implement-pr -> /finish-pr) and /release-harness was removed; releases are now automated via release-please. Consumers referencing the old skill names must update them.
+
+### Features
+
+* universal harness overhaul — rename skills, free CI + release-please, repo hygiene ([f7a9122](https://github.com/JDSavvy/claude-harness/commit/f7a9122cc1c4988a19c45e3cd2530b64a94f1cea))
+
 ## [Unreleased]
 
 The next release — a **major** bump, since the skill renames are breaking for consumers. It is cut
