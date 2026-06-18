@@ -6,20 +6,15 @@ All notable changes to the `harness` plugin. Versions track
 
 ## [2.0.0](https://github.com/JDSavvy/claude-harness/compare/harness-v1.2.0...harness-v2.0.0) (2026-06-18)
 
+A universal-harness overhaul — project-neutral, senior-BP, with free CI and automated releases.
 
 ### ⚠ BREAKING CHANGES
 
-* skill names changed (/spec -> /create-issue, /implement-pr -> /finish-pr) and /release-harness was removed; releases are now automated via release-please. Consumers referencing the old skill names must update them.
-
-### Features
-
-* universal harness overhaul — rename skills, free CI + release-please, repo hygiene ([f7a9122](https://github.com/JDSavvy/claude-harness/commit/f7a9122cc1c4988a19c45e3cd2530b64a94f1cea))
-
-## [Unreleased]
-
-The next release — a **major** bump, since the skill renames are breaking for consumers. It is cut
-automatically by `release-please` from the Conventional Commits on `main`; this section is the
-human-readable preview until then.
+- **Skills renamed:** `/spec` → `/create-issue` and `/implement-pr` → `/finish-pr` (both decoupled from
+  any specific implementation surface — no `@claude` assumptions). Consumers referencing the old names
+  must update them.
+- **`/release-harness` removed** from the plugin — releasing is now automated via `release-please`, so it
+  no longer clutters every consumer's skill list.
 
 ### Added
 
@@ -27,27 +22,18 @@ human-readable preview until then.
   asserting, including negative/absence claims; an in-context list is not a source of truth" rule into
   every consumer session (`hookSpecificOutput.additionalContext`). Opt-out: `HARNESS_AH_REMINDER=off`.
 - **Free CI** (`.github/workflows/ci.yml`) running the same `scripts/validate.sh` gate on every push/PR,
-  and **automated releases** via `release-please` (`.github/workflows/release.yml`; the version stays
-  single-sourced in `plugin.json`).
+  and **automated releases** via `release-please` — the version stays single-sourced in `plugin.json`.
 - Repo hygiene: `LICENSE` (MIT), `CONTRIBUTING.md`, `SECURITY.md`, `.editorconfig`, issue/PR templates,
   `CODEOWNERS`, Dependabot, and a rewritten `README.md` with badges + an inventory table.
 - `scripts/validate.sh` now auto-discovers every `tests/*.test.sh` and parses the release-please JSON.
-- Behavior-test coverage now spans **all four** plugin shell files — added hermetic tests for
-  `harness-update-check.sh` (throttle, `ls-remote` behind-detection, notify-only) and `lib/common.sh`
-  (`json_str` escaping, `emit_context` JSON shape, `run_with_timeout` watchdog).
+- Hermetic behavior tests now cover **all four** plugin shell files (added `harness-update-check.sh` and
+  `lib/common.sh` coverage).
 
-### Changed (BREAKING)
+### Changed
 
-- Renamed skills: **`/spec` → `/create-issue`** and **`/implement-pr` → `/finish-pr`**, both decoupled
-  from any specific implementation surface (no `@claude` assumptions). Update references to the old names.
 - Genericized the harness to be fully project-neutral (removed all project-specific examples) and refined
   the contract: the "no GitHub CI compute" rule applies to *consumer* repos, while this public marketplace
-  repo uses its own free read-only CI.
-
-### Removed (BREAKING)
-
-- **`/release-harness`** skill — releasing the plugin is now automated via `release-please`, so it is no
-  longer a maintainer-only skill cluttering every consumer's skill list.
+  repo uses its own free read-only CI as the documented exception. ([f7a9122](https://github.com/JDSavvy/claude-harness/commit/f7a9122cc1c4988a19c45e3cd2530b64a94f1cea))
 
 ## 1.2.0 — 2026-06-15
 

@@ -47,10 +47,11 @@ install on folder-trust:
 > review it. For higher-privileged consumers, especially CI runners holding tokens, prefer
 > `autoUpdate: false` and update deliberately via `/plugin marketplace update claude-harness`.
 
-**`@claude` GitHub Action** — add to the workflow's `with:` block:
+**`@claude` GitHub Action** — add these inputs to your existing authenticated `anthropics/claude-code-action` step's `with:` block (they sit alongside its `claude_code_oauth_token` — auth comes from your existing setup):
 
 ```yaml
 with:
+  # ... your existing claude_code_oauth_token ...
   plugin_marketplaces: https://github.com/JDSavvy/claude-harness.git
   plugins: harness@claude-harness
 ```
