@@ -1,0 +1,51 @@
+name: Feature request
+description: Propose a new skill, subagent, hook, or change to the shared harness.
+title: "feat: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Proposals are welcome. Keep in mind the harness is **lean and auditable** — it earns its keep only
+        by serving *every* repo. The universal core stays free of stack assumptions; anything stack-specific
+        belongs in each consumer's own `.claude/`.
+
+        > [!TIP]
+        > For a fully-specced, research-backed proposal you can hand straight to an implementer, run the
+        > **`/create-issue`** skill — it turns a goal into a best-practice GitHub issue for you.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / goal
+      description: What are you trying to achieve, and what gets in the way today?
+      placeholder: e.g. Sessions silently drift when the plugin is several releases behind and ...
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: What you'd like to see — a new skill, subagent, hook, or a change to an existing one.
+    validations:
+      required: true
+  - type: dropdown
+    id: framework-independence
+    attributes:
+      label: Does it pass the framework-independence test?
+      description: >
+        The decider for the universal core: would this break on a Swift / Python / Go repo? If it names a
+        package manager, runner, or framework (pnpm, tsc, swift, pip, …), it is stack-specific and belongs
+        in a consumer's `.claude/`, not in this plugin.
+      options:
+        - "Yes — fully stack-agnostic; belongs in the plugin"
+        - "No — it's stack-specific; belongs per-repo"
+        - "Not sure — needs discussion"
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Other approaches you weighed, and why you set them aside.
+    validations:
+      required: false

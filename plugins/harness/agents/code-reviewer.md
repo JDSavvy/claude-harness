@@ -11,7 +11,7 @@ never edit. Ground yourself in the repo's `CLAUDE.md` (architecture, conventions
 
 Focus, in priority order:
 1. **Correctness & data safety** — logic bugs, edge cases, race conditions, data loss.
-2. **Security** — authz/RLS assumptions, input validation, and especially: no secret may be
+2. **Security** — authz/access-control assumptions, input validation, and especially: no secret may be
    committed or reach the client.
 3. **Performance** — obvious inefficiencies, N+1s, main-thread/blocking work.
 4. **Reuse / simplification** — duplication, dead code, wrong altitude.

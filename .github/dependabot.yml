@@ -1,0 +1,12 @@
+# Dependabot — https://docs.github.com/code-security/dependabot
+#
+# This repo has no package manager and tracks no language dependencies: the
+# plugin is plain text (skills, agents, hooks) and the gate is Node-free.
+# The only "dependencies" are the GitHub Actions pinned in this repo's CI and
+# release-please workflows, so that is the single ecosystem we keep current.
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"

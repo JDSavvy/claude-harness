@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions & ideas (Discussions)
+    url: https://github.com/JDSavvy/claude-harness/discussions
+    about: Open-ended questions, design discussion, and integration help. File an issue only for a concrete bug or proposal.

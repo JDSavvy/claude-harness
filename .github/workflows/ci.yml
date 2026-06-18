@@ -1,0 +1,20 @@
+# Mirrors the LOCAL pre-commit gate exactly: runs the same scripts/validate.sh.
+# shellcheck and python3 are preinstalled on ubuntu-latest; the `claude` CLI is
+# absent and validate.sh skips it gracefully — so no extra setup is needed.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: bash scripts/validate.sh

@@ -24,7 +24,7 @@ echo "claude-harness · validate"
 
 # 1) JSON manifests parse.
 for f in .claude-plugin/marketplace.json plugins/harness/.claude-plugin/plugin.json \
-  plugins/harness/hooks/hooks.json; do
+  plugins/harness/hooks/hooks.json release-please-config.json .release-please-manifest.json; do
   if python3 -c "import json;json.load(open('$f'))" 2>/dev/null; then ok "json parses — $f"; else no "json INVALID — $f"; fi
 done
 

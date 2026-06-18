@@ -375,7 +375,7 @@
             stroke="#e2e8f0"
           />
           <text x="92" y="333" font-size="11.5" fill="#334155">
-            Skills: /spec · /implement-pr · /release-harness
+            Skills: /create-issue · /finish-pr
           </text>
           <rect
             x="392"
@@ -399,7 +399,7 @@
             stroke="#e2e8f0"
           />
           <text x="92" y="368" font-size="11.5" fill="#334155">
-            SessionStart hooks: git-sync + update-check
+            SessionStart hooks: git-sync + update-check + anti-hallucination
           </text>
           <text x="92" y="382" font-size="10.5" fill="#64748b">
             run from ${CLAUDE_PLUGIN_ROOT} · act on the open repo
@@ -498,8 +498,8 @@
       <pre><code>/plugin marketplace add https://github.com/JDSavvy/claude-harness.git
 /plugin install harness@claude-harness</code></pre>
       <p>
-        Now every project on that machine has <code>/spec</code>, the agents,
-        and the hooks.
+        Now every project on that machine has <code>/create-issue</code>, the
+        agents, and the hooks.
       </p>
 
       <h3>B) Repo-committed bootstrap (recommended)</h3>
@@ -516,8 +516,9 @@
       <div class="callout">
         When someone <strong>trusts the repo folder</strong>, Claude Code
         <strong>prompts</strong> them to install it — it is not a silent
-        auto-install (Claude Code security design). This is what Rally now does,
-        so a fresh clone is one click away from the full harness.
+        auto-install (Claude Code security design). This is what a consuming
+        project commits, so a fresh clone is one click away from the full
+        harness.
       </div>
 
       <h2 class="avoid-break"><span class="n">5</span> Updates</h2>
@@ -547,10 +548,9 @@
         </tr>
         <tr>
           <td>
-            <code>/spec</code>, <code>/implement-pr</code>,
-            <code>/release-harness</code><br />
+            <code>/create-issue</code>, <code>/finish-pr</code><br />
             generic <code>code-reviewer</code>, <code>test-runner</code><br />
-            SessionStart hooks (git-sync, update-check)
+            SessionStart hooks (git-sync, update-check, anti-hallucination)
           </td>
           <td>
             <code>CLAUDE.md</code> (commands, conventions)<br />

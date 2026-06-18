@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "claude-harness",
-  "description": "Shared, project-neutral Claude Code harness for JDSavvy's repos (GameStats, rally, future apps). Same skill names/functions everywhere; each project tailors only its stack-specific bits locally.",
+  "description": "Shared, project-neutral Claude Code harness reusable across any repo. Same skill names/functions everywhere; each project tailors only its stack-specific bits locally.",
   "owner": {
     "name": "JDSavvy",
     "email": "jdsavvy@proton.me"
@@ -9,7 +9,7 @@
   "plugins": [
     {
       "name": "harness",
-      "description": "Canonical, stack-agnostic harness: the /spec skill (goal -> researched GitHub issue ready for @claude) and the /implement-pr skill (drive a mentioned PR to done — reconcile against drift as a pre-step, then implement & fix it merge-ready), plus generic code-reviewer and test-runner subagents.",
+      "description": "Canonical, stack-agnostic harness: the /create-issue skill (goal → researched GitHub issue) and the /finish-pr skill (drive a PR to merge-ready — reconcile against drift, then implement & fix it), plus generic code-reviewer and test-runner subagents and SessionStart automation.",
       "author": { "name": "JDSavvy" },
       "category": "development",
       "source": {

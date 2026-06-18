@@ -1,55 +1,21 @@
-# claude-harness — shared Claude Code harness (BP June 2026)
+# claude-harness
 
-A **plugin marketplace** holding one project-neutral plugin (`harness`) that every repo of mine reuses
-— so the _handling_ (skill names, session behaviour, workflow pattern) is identical everywhere, while
-each project tailors only its stack-specific bits locally. Repos never mix. **Claude Code only.**
+> A lean, stack-agnostic, Claude-Code-only agent harness shared across your repos.
 
-## Layout
+[![CI](https://github.com/JDSavvy/claude-harness/actions/workflows/ci.yml/badge.svg)](https://github.com/JDSavvy/claude-harness/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/JDSavvy/claude-harness?sort=semver)](https://github.com/JDSavvy/claude-harness/releases)
+[![License: MIT](https://img.shields.io/github/license/JDSavvy/claude-harness)](LICENSE)
+![Claude Code](https://img.shields.io/badge/Claude%20Code-plugin-de7356)
 
-```
-claude-harness/
-├── .claude-plugin/marketplace.json     # this repo IS the marketplace (NO version here — see plugin.json)
-└── plugins/harness/                    # the shared plugin
-    ├── .claude-plugin/plugin.json      # single source of truth for the version
-    ├── skills/
-    │   ├── spec/SKILL.md               # /spec — goal → researched GitHub issue (no code)
-    │   ├── implement-pr/SKILL.md       # /implement-pr — drive a mentioned PR to done
-    │   └── release-harness/SKILL.md    # /release-harness — cut a versioned release of this plugin
-    ├── agents/                         # generic, stack-agnostic subagents
-    │   ├── code-reviewer.md
-    │   └── test-runner.md
-    └── hooks/                          # generic SessionStart automation (runs in EVERY enabled repo)
-        ├── hooks.json
-        ├── session-git-sync.sh         # fetch + ahead/behind/dirty notify; safe FF-only when clean & behind
-        ├── harness-update-check.sh     # notify when this plugin is behind its remote (throttled; never auto-updates)
-        └── lib/common.sh               # shared bash helpers (portable watchdog, JSON context emit)
-```
+## What is this
 
-## Session-start automation (shipped by the plugin)
+A Claude Code plugin **marketplace** holding a single plugin, `harness`. An _agent harness_ is the set of
+skills, hooks, and subagents that shape **how the agent works** — the workflow, not the code it writes.
+The design is a two-layer model: this plugin is the **universal core** (pure git/workflow logic, zero
+stack assumptions), and each consumer repo's own committed `.claude/` is the **stack adapter** (formatter,
+linter, build/test commands, project skills).
 
-Once `harness@claude-harness` is enabled, its `SessionStart` hooks run automatically in **every** project
-(verified: plugin hooks merge with your user/project hooks). All are non-destructive, offline-safe,
-worktree-safe, and always exit 0 — they never hang or block a session.
-
-- **git-sync** (`session-git-sync.sh`) — fetches the upstream branch (bounded; offline = no-op), then:
-  - clean tree **and** strictly behind → safe `git merge --ff-only` (stay current, avoid stale-base merge/commit failures);
-  - dirty / ahead / diverged / detached / no-upstream → **notify only**, never mutate;
-  - up to date → silent.
-  - Opt-out: `HARNESS_GIT_SYNC=off` (disable) · `HARNESS_GIT_SYNC_AUTOFF=off` (notify, no auto-FF).
-- **update-check** (`harness-update-check.sh`) — compares the installed plugin against its remote via a
-  live `ls-remote` (throttled ≈ once/day) and tells you to run `/plugin marketplace update claude-harness`
-  when behind. Deliberately does **not** auto-update a globally-shared plugin mid-session. Opt-out: `HARNESS_UPDATE_CHECK=off`.
-
-## What is SHARED (here) vs PER-REPO (committed in each project)
-
-| Shared (this plugin)                                      | Per-repo (`<project>/.claude/`, `.github/`)                                   |
-| --------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| `/spec`, `/implement-pr`, `/release-harness` skills       | `.github/workflows/claude*.yml` (must live in the repo)                       |
-| generic `code-reviewer`, `test-runner` subagents          | repo `settings.json` (permissions, plugin bootstrap, project hooks)           |
-| generic `SessionStart` **hooks** (git-sync, update-check) | **stack-specific hooks** (formatter, i18n, anti-mixing guard …)               |
-|                                                           | `CLAUDE.md` (build/test commands, conventions), app-specific skills/subagents |
-
-## Integrate into a project
+## Install
 
 **Interactive (one-time per machine):**
 
@@ -58,8 +24,8 @@ worktree-safe, and always exit 0 — they never hang or block a session.
 /plugin install harness@claude-harness
 ```
 
-**Repo-committed bootstrap (recommended)** — add to the project's `.claude/settings.json` so new clones
-are _prompted_ to install on folder-trust:
+**Repo-committed bootstrap** — add to the project's `.claude/settings.json` so clones are prompted to
+install on folder-trust:
 
 ```json
 {
@@ -76,46 +42,59 @@ are _prompted_ to install on folder-trust:
 }
 ```
 
-> This **prompts** on folder-trust — it is not a silent auto-install (Claude Code security design).
->
-> ⚠️ **Trust implication of `autoUpdate: true`:** it refreshes the marketplace **and plugin** from the
-> mutable `main` branch at every session start — each start runs whatever `main` currently is (including
-> its SessionStart hooks) before you can review it. That is only safe if you fully trust this repo and the
-> owner account. For higher-privileged consumers — especially CI runners holding tokens — prefer
-> **`autoUpdate: false`** and update deliberately via `/plugin marketplace update claude-harness`, so a
-> human stays between a push and its execution. The update-check hook is the belt-and-suspenders signal
-> either way.
+> `autoUpdate: true` refreshes the marketplace and plugin from the mutable `main` branch at every session
+> start — each start runs whatever `main` currently is (including its SessionStart hooks) before you can
+> review it. For higher-privileged consumers, especially CI runners holding tokens, prefer
+> `autoUpdate: false` and update deliberately via `/plugin marketplace update claude-harness`.
 
-**Autonomous @claude GitHub Action** — add to the repo's `claude.yml` / `claude-code-review.yml`
-(verified inputs of `anthropics/claude-code-action`, as of 2026-06-15):
+**`@claude` GitHub Action** — add to the workflow's `with:` block:
 
 ```yaml
 with:
-  claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
   plugin_marketplaces: https://github.com/JDSavvy/claude-harness.git
   plugins: harness@claude-harness
 ```
 
-> This marketplace repo is **public**, so the Action clones it with the default `GITHUB_TOKEN` — no PAT
-> needed. ⚠️ If it is ever flipped **private**, both workflows silently fail to load the plugin unless a
-> PAT with `repo` read scope is wired into the checkout/action.
+## What's inside
 
-## Versioning / updates
+| Element                        | What it does                                                                                              | Opt-out                  |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------- | ------------------------ |
+| `/create-issue`                | Turn a goal into a researched, best-practice GitHub issue — no code; ends at the issue                    | —                        |
+| `/finish-pr`                   | Drive a PR to merge-ready: reconcile against drift (merge base, never rebase), implement, verify, push once | —                        |
+| `code-reviewer`                | Opus subagent — reviews correctness, security, performance, reuse                                          | —                        |
+| `test-runner`                  | Sonnet subagent — runs the repo's lint + build + test gate                                                 | —                        |
+| `session-git-sync`             | Bounded fetch + ahead/behind/dirty notify; safe `git merge --ff-only` only when clean & strictly behind   | `HARNESS_GIT_SYNC=off`   |
+| `harness-update-check`         | Throttled (~daily) `ls-remote` check; notifies (never auto-updates) when the plugin is behind             | `HARNESS_UPDATE_CHECK=off` |
+| `anti-hallucination-reminder`  | Injects the universal "verify before asserting, incl. negative claims" rule into every session            | `HARNESS_AH_REMINDER=off`  |
 
-- **Single source of truth:** the version lives **only** in `plugins/harness/.claude-plugin/plugin.json`.
-  Do **not** add a `version` to the marketplace entry — Claude Code lets `plugin.json` win and the two
-  silently drift.
-- Cut releases with **`/release-harness`**: it validates the plugin, bumps `plugin.json`, updates
-  `CHANGELOG.md`, makes a Conventional Commit and tags it.
-- Consumers either enable `autoUpdate` (refresh at startup) or run `/plugin marketplace update
-claude-harness`; the update-check hook surfaces when they're behind. One change here propagates to
-  every project on the next refresh.
+## Shared vs per-repo
 
-## Working on this repo
+| Shared — this plugin                                                | Per-repo — each project's `.claude/`                                  |
+| ------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| `/create-issue`, `/finish-pr` skills                                | Formatter, linter, dependency install                                 |
+| Generic `code-reviewer`, `test-runner` subagents                    | The quality-gate commands (lint / build / test)                       |
+| Generic `SessionStart` hooks (git-sync, update-check, AH reminder)  | Project-specific skills and specialized subagents                     |
+| Pure git/workflow logic, zero stack assumptions                     | The project `CLAUDE.md` and `.claude/settings.json` bootstrap         |
 
-Read `CLAUDE.md` first (hard rules + how to extend). A local quality gate runs **on every commit**
-(pre-commit via `.githooks/`; enable once per clone with `bash scripts/setup.sh`):
-`scripts/validate.sh` parses the JSON manifests, checks the version is single-sourced, runs `bash -n`
+Decider: _would this break on a Swift / Python / Go repo?_ If yes, it is per-repo and never lives in the plugin.
 
-- `shellcheck` on the hooks, `claude plugin validate`, and the hook behavior tests in `tests/`.
-  **No GitHub compute — quality runs locally.** Bypass a commit with `git commit --no-verify`.
+## Quality & releases
+
+After `bash scripts/setup.sh` (once per clone), a local quality gate runs on every commit (pre-commit
+via `.githooks/`). The **same** `scripts/validate.sh` runs locally and in this repo's free
+read-only CI: it parses the JSON manifests, checks the version is single-sourced, runs `bash -n` and
+`shellcheck` on the hooks, `claude plugin validate`, skill/agent frontmatter and `hooks.json` reference
+integrity, and every `tests/*.test.sh`. It is Node-free and bypassable with `git commit --no-verify`.
+
+Releases are automated via **release-please** (Conventional Commits → release PR → on merge, tag +
+GitHub Release). The version is single-sourced in `plugins/harness/.claude-plugin/plugin.json` — never in
+`marketplace.json`. No GitHub CI compute is imposed on consumer repos; this public repo's own CI and
+release-please are the deliberate exception.
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the workflow, and [CLAUDE.md](CLAUDE.md) for the hard rules and the harness contract.
+
+## License
+
+[MIT](LICENSE) © 2026 JDSavvy
