@@ -20,7 +20,10 @@ human-readable preview until then.
   single-sourced in `plugin.json`).
 - Repo hygiene: `LICENSE` (MIT), `CONTRIBUTING.md`, `SECURITY.md`, `.editorconfig`, issue/PR templates,
   `CODEOWNERS`, Dependabot, and a rewritten `README.md` with badges + an inventory table.
-- `scripts/validate.sh` now auto-discovers every `tests/*.test.sh`.
+- `scripts/validate.sh` now auto-discovers every `tests/*.test.sh` and parses the release-please JSON.
+- Behavior-test coverage now spans **all four** plugin shell files — added hermetic tests for
+  `harness-update-check.sh` (throttle, `ls-remote` behind-detection, notify-only) and `lib/common.sh`
+  (`json_str` escaping, `emit_context` JSON shape, `run_with_timeout` watchdog).
 
 ### Changed (BREAKING)
 
