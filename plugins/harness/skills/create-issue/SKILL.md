@@ -2,14 +2,15 @@
 name: create-issue
 description: >-
   Turn a declared goal into a research-backed, current-best-practice GitHub issue — a clean, complete
-  spec ready to implement however you later choose to pick it up. Use when the user wants to declare or
-  plan a task, feature, fix, or change and have the issue prepared (NOT implemented yet) — e.g. "create
-  an issue for X", "/create-issue", "draft an implementation brief", "plan X", "spec out X", "erstelle
-  ein Issue / eine Spec", "Task/Implementierungs-Spec vorbereiten", "ich will X umsetzen". Fetches
-  today's date, researches the latest best practices for the requirement (pins versions empirically),
-  asks ONLY the questions that genuinely need the owner (the rest is decided from research + the
-  codebase), then writes a complete GitHub issue. Makes NO code changes — never touches the working
-  tree, branches, or opens a PR. Stack-agnostic: it reads the repo's CLAUDE.md to ground itself.
+  spec ready to implement however you later choose to pick it up. Use when the user wants a task,
+  feature, fix, or change written up as a persisted GitHub issue/spec (NOT implemented yet) — e.g.
+  "create an issue for X", "/create-issue", "draft an implementation brief / spec", "spec out X",
+  "erstelle ein Issue / eine Spec für X", "Task/Implementierungs-Spec vorbereiten". Fetches today's date,
+  researches the latest best practices for the requirement (pins versions empirically), asks ONLY the
+  questions that genuinely need the owner (the rest is decided from research + the codebase), then writes
+  a complete GitHub issue. Makes NO code changes — never touches the working tree, branches, or opens a
+  PR. Distinct from /plan-change, which produces an in-session plan artifact and creates NO GitHub issue;
+  use this only when the deliverable is a persisted issue. Stack-agnostic: reads the repo's CLAUDE.md.
 argument-hint: "<goal>"
 ---
 

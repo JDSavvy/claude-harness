@@ -72,7 +72,10 @@ re-aligned one.
 ### 4. Verify
 Run the repo's real quality gate from `CLAUDE.md` (lint + typecheck/build + tests; mirror CI, e.g. strict
 linters). **iOS/Xcode caveat:** a Linux runner cannot build the app — defer real build/test to the repo's
-**macOS CI** (push-then-watch-CI). Web/TS stacks: verify locally / in Linux CI.
+**macOS CI** (push-then-watch-CI). Web/TS stacks: verify locally / in Linux CI. The done-bar is the
+**universal Definition of Done**: repo gate green; tests that **bite** for the new logic (never weakened,
+skipped, or deleted to pass); conventional commit; docs updated where needed; no secret leak; and the
+PR's acceptance criteria met **and verified** against the live source — not assumed.
 
 ### 5. Push once & report
 Push the head branch **once** (plain push; `--force-with-lease` only if unavoidable; **never** bare
