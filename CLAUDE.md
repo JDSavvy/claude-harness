@@ -29,8 +29,8 @@ so the harness stays **truly framework-independent** (Swift, Next.js, Python, Go
 
 1. **Universal core — the plugin (`plugins/harness/`), one copy per machine.** Pure git/workflow logic,
    zero stack assumptions: `session-git-sync`, `harness-update-check`, `anti-hallucination-reminder`,
-   `/create-issue`, `/finish-pr`, and the generic `code-reviewer` + `test-runner` (which read each repo's
-   CLAUDE.md). Releasing *this* plugin is deliberately **not** here — it's maintainer-only automation (see
+   `/plan-change`, `/create-issue`, `/finish-pr`, and the generic `code-reviewer` + `test-runner` (which
+   read each repo's CLAUDE.md). Releasing *this* plugin is deliberately **not** here — it's maintainer-only automation (see
    *How to extend*), so it never pollutes a consumer's skill list.
 2. **Stack adapter — each project's committed `.claude/` (its "subharness").** Everything stack-specific:
    formatter, linter, dependency install, the quality-gate _commands_, project skills, specialized

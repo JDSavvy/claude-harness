@@ -73,9 +73,14 @@ review it — including its SessionStart hooks, unsandboxed, with your user righ
 
 **Pinning & deliberate updates.** With `autoUpdate: false`, the installed plugin stays put until you update
 **after review** with `/plugin marketplace update claude-harness` (each release is the single-sourced
-`plugin.json` version). Read the
-migration guide before adopting a new **major**. This is the same tradeoff the [README](../README.md#install)
-states at the install step — this table is the canonical version of it.
+`plugin.json` version). Read the migration guide before adopting a new **major**. This is the same tradeoff
+the [README](../README.md#install) states at the install step — this table is the canonical version of it.
+
+> **What pinning does and doesn't do.** `autoUpdate: false` pins *when* you take an update (you choose the
+> moment), not *which commit* — the marketplace source tracks the mutable `main` branch (`ref: main` in
+> `marketplace.json`), so a manual `update` still pulls whatever `main` is at that instant. Tags/releases
+> exist for humans to read the changelog and diff; the harness does **not** currently offer git-tag pinning
+> in the consumer bootstrap. Update right after reviewing the release notes so the gap stays small.
 
 ## How consumers pick up a release
 
