@@ -6,6 +6,17 @@
       "release-type": "simple",
       "package-name": "harness",
       "changelog-path": "CHANGELOG.md",
+      "changelog-sections": [
+        { "type": "feat", "section": "Features" },
+        { "type": "fix", "section": "Bug Fixes" },
+        { "type": "perf", "section": "Performance Improvements" },
+        { "type": "docs", "section": "Documentation" },
+        { "type": "test", "section": "Tests" },
+        { "type": "refactor", "section": "Code Refactoring", "hidden": true },
+        { "type": "build", "section": "Build System", "hidden": true },
+        { "type": "ci", "section": "Continuous Integration", "hidden": true },
+        { "type": "chore", "section": "Miscellaneous", "hidden": true }
+      ],
       "extra-files": [
         {
           "type": "json",
