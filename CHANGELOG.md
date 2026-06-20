@@ -4,6 +4,21 @@ All notable changes to the `harness` plugin. Versions track
 `plugins/harness/.claude-plugin/plugin.json` (the single source of truth). Loosely follows
 [Keep a Changelog]; the repo uses Conventional Commits.
 
+## [2.1.1](https://github.com/JDSavvy/claude-harness/compare/harness-v2.1.0...harness-v2.1.1) (2026-06-20)
+
+
+### Bug Fixes
+
+* **gate:** enforce bash-3.2 multibyte-safe interpolation; reject empty descriptions ([#29](https://github.com/JDSavvy/claude-harness/issues/29)) ([473f72c](https://github.com/JDSavvy/claude-harness/commit/473f72c7af69e1fe27c87d8304a1384474a69302))
+* **hooks:** harden guard template — short/refspec force-push, rm variants, control-char-safe deny ([#30](https://github.com/JDSavvy/claude-harness/issues/30)) ([ef82359](https://github.com/JDSavvy/claude-harness/commit/ef82359fc084f4ea3bf687c149d9761c82db4d46))
+* **skills:** sharpen create-issue↔plan-change boundary; finish-pr reaches the universal DoD ([#27](https://github.com/JDSavvy/claude-harness/issues/27)) ([459e9e6](https://github.com/JDSavvy/claude-harness/commit/459e9e6c5bebb64afee6143f5429942ab6222b56))
+
+
+### Documentation
+
+* **readme:** award-winning visual redesign with branded SVGs ([#33](https://github.com/JDSavvy/claude-harness/issues/33)) ([3b7d941](https://github.com/JDSavvy/claude-harness/commit/3b7d9419d1585f8b35499e236e8f4599dee65d3b))
+* secure-by-default autoUpdate, command namespacing, /plan-change inventory, pinning honesty ([#31](https://github.com/JDSavvy/claude-harness/issues/31)) ([415b112](https://github.com/JDSavvy/claude-harness/commit/415b11277f9d722c1e477b7214de0dca705f176e))
+
 ## [2.1.0](https://github.com/JDSavvy/claude-harness/compare/harness-v2.0.0...harness-v2.1.0) (2026-06-20)
 
 
