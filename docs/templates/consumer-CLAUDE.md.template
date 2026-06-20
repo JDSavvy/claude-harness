@@ -1,0 +1,56 @@
+<!--
+  TEMPLATE — per-repo CLAUDE.md skeleton (Layer 2, the "stack adapter").
+  Copy to ./CLAUDE.md (or .claude/CLAUDE.md) in your repo and fill every <SLOT>. This is where ALL
+  stack-specific knowledge lives — the harness plugin (Layer 1) is generic and reads THIS file to learn
+  your repo's commands, conventions, and extra rules. Delete any section that doesn't apply.
+  Harness contract: https://github.com/JDSavvy/claude-harness/blob/main/CLAUDE.md
+-->
+
+# CLAUDE.md — <PROJECT NAME>
+
+<One paragraph: what this repo is, who/what it serves, and the top-level architecture.>
+
+## Stack & commands
+
+> The harness's generic `test-runner` and `code-reviewer` subagents read these instead of hardcoding
+> commands. Keep them accurate — they are the contract for "run the gate".
+
+- **Stack:** `<SLOT: language(s) / framework(s) / runtime — e.g. Swift 6 · Next.js 15 · Python 3.12 · Go 1.23>`
+- **Install deps:** `<SLOT: e.g. pnpm install | swift package resolve | pip install -e . | go mod download>`
+- **Lint / format-check:** `<SLOT: e.g. pnpm lint && pnpm format:check | swiftlint | ruff check . | golangci-lint run>`
+- **Type-check / build:** `<SLOT: e.g. pnpm build | swift build | mypy . | go build ./...>`
+- **Test:** `<SLOT: e.g. pnpm test | swift test | pytest -q | go test ./...>`
+
+## Quality gate (local)
+
+Run before pushing — mirror CI: `<SLOT: the single command or sequence that runs the gate>`.
+Wired as a **pre-push** gate via `lefthook.yml` or `.githooks/pre-push` (copied from the harness templates).
+
+## Risk & Approval (per-repo additions)
+
+> EXTENDS the harness universal core (secrets · irreversible git · irreversible DB/infra · prod/external
+> actions); it never weakens it. Turn the sharp cases into hard local blocks with the PreToolUse guard.
+
+- `<SLOT: e.g. "Never touch the payments schema without approval">`
+- `<SLOT: e.g. "Never post to the prod Slack workspace">`
+- `<SLOT: an off-limits service / MCP server — enforce hard via .claude/hooks/pretooluse-guard.sh>`
+
+## Definition of Done (per-repo additions)
+
+> EXTENDS the harness universal DoD (gate green · tests that bite · conventional commit · docs · no secret
+> leak · acceptance criteria verified); it never drops it.
+
+- `<SLOT: e.g. "Snapshot tests updated", "a11y check passes", "perf budget respected">`
+
+## Conventions & architecture
+
+- `<SLOT: naming, module boundaries, the patterns to follow / avoid>`
+- `<SLOT: where things live; what must NOT be touched>`
+
+## Harness
+
+This repo enables the shared `harness@claude-harness` plugin via `.claude/settings.json`
+(`extraKnownMarketplaces` + `enabledPlugins` + `autoUpdate`). The plugin provides `/plan-change`,
+`/create-issue`, `/finish-pr`, the generic `code-reviewer` / `test-runner` subagents, and SessionStart
+automation. Pick `autoUpdate` by privilege — see the harness heuristic at
+https://github.com/JDSavvy/claude-harness/blob/main/docs/VERSIONING.md

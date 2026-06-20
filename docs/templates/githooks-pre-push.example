@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# TEMPLATE — zero-dependency pre-push quality gate (for repos without a package manager).
+# Copy to .githooks/pre-push, make it executable (chmod +x), and point git at it once per clone:
+#   git config core.hooksPath .githooks
+# Or self-activate it from a per-repo SessionStart hook that sets core.hooksPath ONLY when unset
+# (idempotent — never clobbers a repo that already runs Lefthook or set its own hooksPath).
+# Emergency bypass for one push: git push --no-verify
+set -euo pipefail
+cd "$(git rev-parse --show-toplevel)" || exit 1
+
+# Replace the body below with your repo's real gate — mirror CI, cheapest check first.
+# Pick ONE stack and delete the rest (these are examples, not defaults):
+#   Swift:  swiftlint && swift build && swift test
+#   Node:   pnpm lint && pnpm build && pnpm test
+#   Python: ruff check . && mypy . && pytest -q
+#   Go:     golangci-lint run && go build ./... && go test ./...
+echo "pre-push: configure .githooks/pre-push with your repo's lint/build/test, then delete this guard." >&2
+exit 1 # fail closed until configured — an unconfigured gate must not give false confidence

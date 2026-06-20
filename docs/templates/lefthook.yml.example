@@ -1,0 +1,16 @@
+# TEMPLATE — Lefthook pre-push quality gate (language-agnostic; recommended).
+# Lefthook is a single Go binary, so it needs no package manager: https://github.com/evilmartians/lefthook
+# Copy to ./lefthook.yml, replace each "<…>" with your repo's real command, then install the hooks once:
+#   lefthook install
+# Emergency bypass for one push: git push --no-verify
+#
+# Keep the cheapest check first so a failing lint stops the push before the slow build/test.
+pre-push:
+  parallel: false
+  commands:
+    lint:
+      run: "<your lint / format-check command — e.g. pnpm lint>"
+    typecheck-build:
+      run: "<your type-check or build command — e.g. pnpm build>"
+    test:
+      run: "<your test command — e.g. pnpm test>"

@@ -51,7 +51,8 @@ so the harness stays **truly framework-independent** (Swift, Next.js, Python, Go
   per clone** (`scripts/setup.sh` — sets `core.hooksPath` **unconditionally**) or have it
   **self-activate** via a per-repo SessionStart hook that sets `core.hooksPath` **only when unset** (the
   canonical auto pattern — see **Reviewed** below). Either way the gate runs on **pre-push** and is
-  `--no-verify`-bypassable.
+  `--no-verify`-bypassable. Copyable, stack-neutral starting points live in `docs/templates/`
+  (`lefthook.yml.example`, `githooks-pre-push.example`, and the per-repo `consumer-CLAUDE.md.template`).
 - **GitHub stays review-only for consumers.** Keep `@claude` / Claude-PR-Review workflows if a project
   wants them; no build/test compute in a *consumer's* Actions.
 - **This public marketplace repo is the deliberate exception.** Public repos get **free** GitHub Actions
