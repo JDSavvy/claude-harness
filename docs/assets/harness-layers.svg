@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 340" role="img" aria-label="Two-layer model: the universal plugin (Layer 1) and each repo's per-repo .claude adapter (Layer 2)">
+  <defs>
+    <style>
+      .ttl   { font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif; font-weight:700; fill:#1f2328; }
+      .sub   { font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif; fill:#57606a; }
+      .lbl   { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-weight:700; fill:#ffffff; letter-spacing:0.5; }
+      .mono  { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; fill:#bd5733; }
+      .body  { font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif; fill:#3a4148; }
+      .chip  { font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif; font-weight:600; }
+    </style>
+  </defs>
+
+  <rect x="2" y="2" width="896" height="336" rx="18" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text x="30" y="38" class="ttl" font-size="18">Two layers — so the harness stays universal, your stack stays yours</text>
+
+  <!-- Layer 1: the plugin -->
+  <rect x="28" y="54" width="844" height="104" rx="13" fill="#fbeee8" stroke="#e79b7e" stroke-width="1.4"/>
+  <rect x="46" y="70" width="86" height="24" rx="7" fill="#bd5733"/>
+  <text x="89" y="87" text-anchor="middle" class="lbl" font-size="12.5">LAYER 1</text>
+  <text x="146" y="83" class="ttl" font-size="16">The plugin — universal core</text>
+  <text x="146" y="101" class="sub" font-size="12">this repo · one copy per machine · pure git/workflow logic</text>
+  <g transform="translate(708,70)">
+    <rect width="142" height="24" rx="12" fill="#ffffff" stroke="#e79b7e" stroke-width="1.2"/>
+    <text x="71" y="16.5" text-anchor="middle" class="chip" font-size="12" fill="#bd5733">stack-agnostic ✓</text>
+  </g>
+  <text x="48" y="130" class="body" font-size="12.8"><tspan class="chip" fill="#1f2328">Skills</tspan>  <tspan class="mono">/plan-change · /create-issue · /finish-pr</tspan></text>
+  <text x="48" y="149" class="body" font-size="12.8"><tspan class="chip" fill="#1f2328">Subagents</tspan> <tspan class="mono">code-reviewer · test-runner</tspan><tspan class="chip" fill="#1f2328" dx="26">Hooks</tspan> <tspan class="mono">git-sync · update-check · anti-hallucination</tspan></text>
+
+  <!-- connector -->
+  <g stroke="#9aa5b1" stroke-width="1.6" fill="none">
+    <path d="M450 158 v26"/>
+    <path d="M444 178 l6 6 6 -6"/>
+  </g>
+  <text x="464" y="177" class="sub" font-size="12" font-style="italic">the plugin reads each repo's <tspan class="mono" font-size="12" font-style="normal">CLAUDE.md</tspan> to learn its commands</text>
+
+  <!-- Layer 2: per-repo -->
+  <rect x="28" y="190" width="844" height="104" rx="13" fill="#ffffff" stroke="#d8dee4" stroke-width="1.4"/>
+  <rect x="46" y="206" width="86" height="24" rx="7" fill="#57606a"/>
+  <text x="89" y="223" text-anchor="middle" class="lbl" font-size="12.5">LAYER 2</text>
+  <text x="146" y="219" class="ttl" font-size="16">Each repo's <tspan class="mono" font-size="15">.claude/</tspan> — the stack adapter</text>
+  <text x="146" y="237" class="sub" font-size="12">committed per project · everything stack-specific lives here</text>
+  <g transform="translate(708,206)">
+    <rect width="142" height="24" rx="12" fill="#f6f8fa" stroke="#d8dee4" stroke-width="1.2"/>
+    <text x="71" y="16.5" text-anchor="middle" class="chip" font-size="12" fill="#57606a">stack-specific</text>
+  </g>
+  <text x="48" y="266" class="body" font-size="12.8"><tspan class="chip" fill="#1f2328">Gate</tspan> formatter · linter · build/test commands<tspan class="chip" fill="#1f2328" dx="26">Project</tspan> skills &amp; guards</text>
+  <text x="48" y="285" class="body" font-size="12.8">the project's own <tspan class="mono">CLAUDE.md</tspan> + <tspan class="mono">.claude/settings.json</tspan> bootstrap · a local pre-push gate</text>
+
+  <!-- decider -->
+  <text x="30" y="320" class="sub" font-size="12.5" fill="#6e7781">Decider: <tspan font-style="italic">would this break on a Swift / Python / Go repo?</tspan>  Yes → per-repo (Layer 2).  No → universal (Layer 1).</text>
+</svg>
