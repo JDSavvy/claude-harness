@@ -67,7 +67,7 @@ with:
 | `/finish-pr`                   | Drive a PR to merge-ready: reconcile against drift (merge base, never rebase), implement, verify, push once | —                        |
 | `code-reviewer`                | Opus subagent — reviews correctness, security, performance, reuse                                          | —                        |
 | `test-runner`                  | Sonnet subagent — runs the repo's lint + build + test gate                                                 | —                        |
-| `session-git-sync`             | Bounded fetch + ahead/behind/dirty notify; safe `git merge --ff-only` only when clean & strictly behind   | `HARNESS_GIT_SYNC=off`   |
+| `session-git-sync`             | Bounded fetch + ahead/behind/dirty notify; safe `git merge --ff-only` only when clean & strictly behind, with a forensic audit line (`+N` and `old→new` HEAD) on the fast-forward | `HARNESS_GIT_SYNC=off`   |
 | `harness-update-check`         | Throttled (~daily) `ls-remote` check; notifies (never auto-updates) when the plugin is behind             | `HARNESS_UPDATE_CHECK=off` |
 | `anti-hallucination-reminder`  | Injects the universal "verify before asserting, incl. negative claims" rule into every session            | `HARNESS_AH_REMINDER=off`  |
 

@@ -49,9 +49,13 @@ DIRTY=""
 [ -n "$(git status --porcelain 2>/dev/null)" ] && DIRTY=1
 
 # Auto fast-forward: clean + strictly behind + not ahead.
+# Emit a concise, forensic audit line for the ONLY mutation this hook performs (old→new HEAD + count),
+# so the move is never a silent exit 0. Lightweight by design: additionalContext only, no persistent log.
 if [ -z "$DIRTY" ] && [ "$AHEAD" = "0" ] && [ "$BEHIND" -gt 0 ] && [ "${HARNESS_GIT_SYNC_AUTOFF:-on}" != "off" ]; then
+  OLD="$(git rev-parse --short HEAD 2>/dev/null)"
   if git merge --ff-only --quiet "$UPSTREAM" 2>/dev/null; then
-    emit_context "✅ harness git-sync: fast-forwarded $BRANCH by +$BEHIND from $UPSTREAM (tree was clean & behind). HEAD moved — re-read files if cached."
+    NEW="$(git rev-parse --short HEAD 2>/dev/null)"
+    emit_context "✅ harness git-sync: fast-forwarded $BRANCH by +$BEHIND ($OLD→$NEW) from $UPSTREAM (tree was clean & behind). HEAD moved — re-read files if cached."
     exit 0
   fi
 fi
