@@ -172,7 +172,9 @@ in the plugin's `hooks.json`, so nothing hard-blocks in a consumer until they ac
   **Conventional Commits**; on merge to `main`, **`release-please`** opens a release PR (computes the
   SemVer bump, updates `CHANGELOG.md`, and on merge tags + cuts a GitHub Release). The version stays
   single-sourced in `plugin.json` (release-please updates it there). Consumers pick the release up via
-  `autoUpdate` or `/plugin marketplace update claude-harness`. See `CONTRIBUTING.md` for the flow.
+  `autoUpdate` or `/plugin marketplace update claude-harness`. See `CONTRIBUTING.md` for the flow, and
+  `docs/VERSIONING.md` for what counts as **breaking**, the **deprecate-before-remove** rule, the
+  **per-major migration-guide** requirement, and the consumer **`autoUpdate` heuristic**.
 
 ## Quality gate
 

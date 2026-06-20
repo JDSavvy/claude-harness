@@ -46,6 +46,8 @@ install on folder-trust:
 > start — each start runs whatever `main` currently is (including its SessionStart hooks) before you can
 > review it. For higher-privileged consumers, especially CI runners holding tokens, prefer
 > `autoUpdate: false` and update deliberately via `/plugin marketplace update claude-harness`.
+> See [`docs/VERSIONING.md`](docs/VERSIONING.md) for the full `autoUpdate` heuristic, the breaking-change
+> definition, and the per-major migration policy.
 
 **`@claude` GitHub Action** — add these inputs to your existing authenticated `anthropics/claude-code-action` step's `with:` block (they sit alongside its `claude_code_oauth_token` — auth comes from your existing setup):
 
