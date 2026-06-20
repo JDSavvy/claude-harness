@@ -51,6 +51,14 @@ blocks '{"tool_name":"Bash","tool_input":{"command":"cd \"/my project\" && rm -r
 blocks '{"tool_name":"Bash","tool_input":{"command":"git add -A && git commit -m \"wip\" && git push --force-with-lease"}}' "force-push after a quoted -m"
 blocks '{"tool_name":"Bash","tool_input":{"command":"echo \"go\"; git reset --hard HEAD~5"}}' "reset --hard after a quoted echo"
 
+# --- widened destructive forms: short/refspec force-push and rm permutations ---
+blocks '{"tool_name":"Bash","tool_input":{"command":"git push -f origin main"}}' "force-push via -f"
+blocks '{"tool_name":"Bash","tool_input":{"command":"git push origin +HEAD:main"}}' "force-push via +refspec"
+blocks '{"tool_name":"Bash","tool_input":{"command":"rm -r -f /tmp/x"}}' "rm -r -f (split flags)"
+blocks '{"tool_name":"Bash","tool_input":{"command":"rm --recursive /tmp/x"}}' "rm --recursive"
+blocks '{"tool_name":"Bash","tool_input":{"command":"rm -Rf build"}}' "rm -Rf"
+allows '{"tool_name":"Bash","tool_input":{"command":"git push origin my-feature"}}' "normal push not over-blocked"
+
 # --- (2) secret-path writes are blocked ---
 blocks '{"tool_name":"Edit","tool_input":{"file_path":"/repo/.env"}}' "edit .env"
 blocks '{"tool_name":"Write","tool_input":{"file_path":"config/.env.production"}}' "write .env.production"
@@ -88,6 +96,13 @@ out="$(run "$FILLED" '{"tool_name":"Bash","tool_input":{"command":"kubectl --con
 contains '"permissionDecision":"deny"' "$out" "filled placeholder blocks off-limits ref in bash"
 out="$(run "$FILLED" '{"tool_name":"Bash","tool_input":{"command":"echo \"go\"; kubectl --context prod-cluster delete ns x"}}')"
 contains '"permissionDecision":"deny"' "$out" "filled placeholder blocks off-limits ref after a quoted arg"
+
+# --- a control byte in the (interpolated) tool_name must not break the deny JSON (stripped, stays valid) ---
+out="$(printf '{"tool_name":"mcp__prod_db__q\tX","tool_input":{"q":"x"}}' | bash "$FILLED" 2>/dev/null)"
+if printf '%s' "$out" | python3 -c "import json,sys;d=json.load(sys.stdin);assert d['hookSpecificOutput']['permissionDecision']=='deny'" 2>/dev/null; then :; else
+  echo "FAIL [control-char deny JSON]: a tab in tool_name produced invalid deny JSON: $out"
+  fails=$((fails + 1))
+fi
 
 if [ "$fails" -eq 0 ]; then
   echo "pretooluse-guard.test.sh: PASS"
