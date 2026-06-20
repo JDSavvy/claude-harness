@@ -53,9 +53,12 @@ eq() { [ "$1" = "$2" ] || {
 # up-to-date -> silent
 empty "$(run)" "up-to-date silent"
 
-# clean + behind -> auto fast-forward, HEAD moves
+# clean + behind -> auto fast-forward, HEAD moves, with a forensic audit line (count + old→new HEAD)
 adv c2
-contains "fast-forwarded" "$(run)" "clean+behind notifies FF"
+out="$(run)"
+contains "fast-forwarded" "$out" "clean+behind notifies FF"
+contains "+1" "$out" "FF audit line shows the commit count"
+contains "→" "$out" "FF audit line shows old→new HEAD"
 eq "$(head_msg)" "c2" "auto-FF moved HEAD"
 
 # dirty + behind -> notify, NO fast-forward

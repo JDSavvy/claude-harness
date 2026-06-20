@@ -183,7 +183,11 @@ This is the bar the `/plan-change` skill plans toward and that `/finish-pr` driv
 - **New skill:** `plugins/harness/skills/<name>/SKILL.md` (frontmatter `name` + `description`). Keep it generic.
 - **New subagent:** `plugins/harness/agents/<name>.md`.
 - **New hook:** add a script under `plugins/harness/hooks/`, register it in `hooks/hooks.json`, give it an
-  opt-out env var + a watchdog if it does I/O, and add a behavior test under `tests/`.
+  opt-out env var + a watchdog if it does I/O, and add a behavior test under `tests/`. Any **consequential
+  action** it takes (a state mutation, or a hard block) must leave a concise, visible **audit line**
+  (`additionalContext`/stderr) — never a silent `exit 0`, and never a persistent log (a light trace, by
+  decision). Examples: `session-git-sync`'s `fast-forwarded …(old→new)` line and the guard template's
+  `harness guard: blocked — …`.
 - **New copyable template:** `plugins/harness/hooks/templates/<name>.sh.template` — a stack-neutral pattern
   consumers copy into their own `.claude/` and activate themselves; **never** register it in the plugin's
   `hooks.json` (it must not run unreviewed in every consumer). Keep it bash-3.2-portable with an

@@ -61,14 +61,15 @@ allows '{"tool_name":"Bash","tool_input":{"command":"ls -la"}}' "ls"
 allows '{"tool_name":"Bash","tool_input":{"command":"git status"}}' "git status"
 allows '{"tool_name":"Edit","tool_input":{"file_path":"src/main.py","old_string":"a","new_string":"b"}}' "edit normal file"
 
-# --- the deny payload is valid JSON (guards against escaping regressions) ---
+# --- the deny payload is valid JSON, and its reason is the VISIBLE audit (shown to Claude) ---
 out="$(run "$GUARD" '{"tool_name":"Bash","tool_input":{"command":"rm -rf /tmp/x"}}')"
-if printf '%s' "$out" | python3 -c "import json,sys;d=json.load(sys.stdin);assert d['hookSpecificOutput']['permissionDecision']=='deny'" 2>/dev/null; then :; else
-  echo "FAIL [valid JSON]: deny payload is not valid JSON / wrong shape: $out"
+if printf '%s' "$out" | python3 -c "import json,sys;d=json.load(sys.stdin);h=d['hookSpecificOutput'];assert h['permissionDecision']=='deny';assert h['permissionDecisionReason'].strip()" 2>/dev/null; then :; else
+  echo "FAIL [valid JSON]: deny payload is not valid JSON / missing reason: $out"
   fails=$((fails + 1))
 fi
+contains "blocked by guard" "$out" "deny reason is a visible audit (permissionDecisionReason)"
 
-# --- a visible audit line is emitted to stderr on a block (lightweight audit trail, no log file) ---
+# --- a visible audit line is also emitted to stderr on a block (lightweight audit trail, no log file) ---
 err="$(run "$GUARD" '{"tool_name":"Bash","tool_input":{"command":"rm -rf /x"}}' 2>&1 1>/dev/null)"
 contains "harness guard: blocked" "$err" "audit line on block"
 
