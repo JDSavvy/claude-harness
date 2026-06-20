@@ -151,8 +151,11 @@ you can't, say so.)
 project-specific classes in a **`## Risk & Approval`** section of *its own* `.claude/` `CLAUDE.md` — e.g.
 "never touch the `payments` schema", "never post to the prod Slack workspace", a named off-limits service.
 Per-repo rules **add to** the universal core; they never weaken it. The sharp, project-specific cases are
-turned into **hard local blocks** via a per-repo guard (a PreToolUse hook or a pre-push gate in that
-repo's `.claude/`), keeping enforcement local (Layer 2) while the floor here stays universal (Layer 1).
+turned into **hard local blocks** by copying the stack-neutral
+`plugins/harness/hooks/templates/pretooluse-guard.sh.template` into the consumer's `.claude/hooks/` and
+registering it as a **PreToolUse** hook (or by using a pre-push gate) — keeping enforcement local
+(Layer 2) while the floor here stays universal (Layer 1). The template is deliberately **not** registered
+in the plugin's `hooks.json`, so nothing hard-blocks in a consumer until they activate it on purpose.
 
 ## How to extend
 
@@ -160,6 +163,11 @@ repo's `.claude/`), keeping enforcement local (Layer 2) while the floor here sta
 - **New subagent:** `plugins/harness/agents/<name>.md`.
 - **New hook:** add a script under `plugins/harness/hooks/`, register it in `hooks/hooks.json`, give it an
   opt-out env var + a watchdog if it does I/O, and add a behavior test under `tests/`.
+- **New copyable template:** `plugins/harness/hooks/templates/<name>.sh.template` — a stack-neutral pattern
+  consumers copy into their own `.claude/` and activate themselves; **never** register it in the plugin's
+  `hooks.json` (it must not run unreviewed in every consumer). Keep it bash-3.2-portable with an
+  opt-out env var; the gate `bash -n`s and `shellcheck`s `*.sh.template`, and it needs a behavior test
+  under `tests/`.
 - **Releasing is automated and maintainer-only — not a propagated skill.** Land changes via
   **Conventional Commits**; on merge to `main`, **`release-please`** opens a release PR (computes the
   SemVer bump, updates `CHANGELOG.md`, and on merge tags + cuts a GitHub Release). The version stays

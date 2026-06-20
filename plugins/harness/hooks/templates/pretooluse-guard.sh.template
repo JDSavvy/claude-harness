@@ -1,0 +1,107 @@
+#!/usr/bin/env bash
+# ============================================================================================
+# TEMPLATE — per-repo PreToolUse guard (copy into a CONSUMER repo; NOT run by the harness plugin)
+# ============================================================================================
+# The harness plugin ships this as a TEMPLATE only. It is deliberately NOT registered in the
+# plugin's hooks.json, because a sharp, hard-blocking guard is stack-/project-specific and must
+# never run unreviewed in every consumer (Universal Harness Contract: sharp, project-specific
+# guards live per-repo). You activate it per-repo, on purpose.
+#
+# WHAT IT DOES
+#   A PreToolUse hook fires BEFORE a tool runs and can hard-block it. This guard demonstrates the
+#   three canonical block classes from the contract's "Risk & Approval (universal core)":
+#     (1) dangerous Bash      — rm -rf, git push --force/--force-with-lease, git reset --hard
+#     (2) secret-path writes  — creating/editing a .env* file (or a shell redirect into one)
+#     (3) off-limits ref      — a project/MCP server you forbid (PLACEHOLDER — edit before use)
+#   When a call matches, it emits the documented PreToolUse "deny" decision and a visible audit
+#   line; otherwise it exits 0 with no decision, so your normal permission flow is unchanged.
+#
+# HOW TO ACTIVATE (per consumer repo)
+#   1. Copy this file:   cp pretooluse-guard.sh.template .claude/hooks/pretooluse-guard.sh
+#   2. Make it runnable:  chmod +x .claude/hooks/pretooluse-guard.sh
+#   3. Replace every __REPLACE_ME_* placeholder below with your repo's real off-limits refs
+#      (or delete that block if you have none).
+#   4. Register it in .claude/settings.json (an empty matcher fires on ALL tools, so the guard
+#      also sees MCP tool calls):
+#        {
+#          "hooks": {
+#            "PreToolUse": [
+#              { "matcher": "",
+#                "hooks": [ { "type": "command",
+#                             "command": "bash \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/pretooluse-guard.sh" } ] }
+#            ]
+#          }
+#        }
+#
+# DESIGN NOTES
+#   - Defense-in-depth, fail-SAFE: if it cannot positively identify a blocked pattern it exits 0
+#     ("no decision" — normal permission prompts still apply). It is a backstop, not the only gate.
+#   - Portable to macOS bash 3.2: no `jq`, no `timeout`, no GNU-only sed (no `\|` alternation).
+#   - Dangerous-command / off-limits-ref matching scans the RAW request payload, not a reconstructed
+#     field value — so an escaped quote inside the command (JSON `\"`) can't truncate the scan and
+#     slip a token past the guard. The tradeoff is conservative: a blocked substring appearing
+#     anywhere in the tool input over-blocks (fail-LOUD, the safe direction). The `.env` file check
+#     uses the extracted file_path (paths don't carry escaped quotes). Harden for your threat model.
+#   - Opt-out for one session: HARNESS_GUARD=off
+# ============================================================================================
+set -u
+
+case "${HARNESS_GUARD:-on}" in off | 0 | false) exit 0 ;; esac
+
+# PreToolUse hook input arrives as JSON on stdin: { "tool_name": "...", "tool_input": { ... }, ... }
+PAYLOAD="$(cat)"
+
+# json_string_field <key> -> first "key":"value" string value in the payload (top-level OR nested).
+# Best-effort, BSD+GNU-sed safe. Used ONLY for quote-free fields (tool_name, file_path); dangerous-
+# command matching scans the raw payload instead (see DESIGN NOTES) so escaped quotes can't fool it.
+json_string_field() {
+  printf '%s' "$PAYLOAD" | tr '\n' ' ' |
+    sed -n 's/.*"'"$1"'"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -n1
+}
+
+# deny <reason> -> hard-block via the documented PreToolUse decision, plus a visible audit line.
+# (Alternative: print the reason to stderr and `exit 2` — simpler, but no structured reason.)
+deny() {
+  reason="$1"
+  esc="${reason//\\/\\\\}"
+  esc="${esc//\"/\\\"}"
+  printf '{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"%s"}}\n' "$esc"
+  printf 'harness guard: blocked — %s\n' "$reason" >&2 # audit trail (no persistent log)
+  exit 0
+}
+
+TOOL="$(json_string_field tool_name)"
+FILE="$(json_string_field file_path)"
+
+# (1) Dangerous Bash — matched against the RAW payload so an escaped quote in the command can't
+#     truncate the scan and slip a token past the guard (over-blocks rather than under-blocks).
+case "$TOOL" in
+Bash)
+  case "$PAYLOAD" in
+  *"rm -rf"* | *"rm -fr"*) deny "destructive 'rm -rf' blocked by guard" ;;
+  *"git push"*"--force"*) deny "force-push blocked by guard (never on a shared branch; use --force-with-lease only when truly unavoidable)" ;;
+  *"git reset --hard"*) deny "'git reset --hard' blocked by guard (discards work / can rewrite a shared branch) — narrow this rule for your repo if needed" ;;
+  *">"*.env*) deny "writing a .env secret file via shell redirect is blocked by guard" ;;
+  esac
+  ;;
+esac
+
+# (2) Secret-path writes — a .env* file via a file tool (extracted path; paths carry no escaped quotes).
+#     ('*' matches '/', so '*.env' already covers '*/.env', and '.env*' covers '.env.local' etc.)
+case "$FILE" in
+*.env | *.env.*) deny "writing a .env secret file is blocked by guard" ;;
+esac
+
+# (3) Off-limits project / MCP reference — PLACEHOLDER. Replace before activating, or delete this block.
+#     OFF_LIMITS_MCP: an MCP tool-name prefix you forbid, e.g. "mcp__prod_db__".
+#     OFF_LIMITS_REF: a service/project string a Bash command must not touch, e.g. "prod-cluster".
+OFF_LIMITS_MCP="__REPLACE_ME_mcp_prefix__"
+OFF_LIMITS_REF="__REPLACE_ME_service_ref__"
+case "$TOOL" in
+"$OFF_LIMITS_MCP"*) deny "tool '$TOOL' is off-limits in this repo (guard placeholder)" ;;
+esac
+case "$TOOL:$PAYLOAD" in
+Bash:*"$OFF_LIMITS_REF"*) deny "command references off-limits '$OFF_LIMITS_REF' (guard placeholder)" ;;
+esac
+
+exit 0 # not applicable -> no decision; normal permission flow applies

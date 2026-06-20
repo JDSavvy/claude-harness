@@ -80,6 +80,48 @@ with:
 
 Decider: _would this break on a Swift / Python / Go repo?_ If yes, it is per-repo and never lives in the plugin.
 
+## Per-repo enforcement (optional): the PreToolUse guard
+
+The universal *Risk & Approval* floor (in [CLAUDE.md](CLAUDE.md)) is a behavioural contract. To turn the
+**sharp, project-specific** cases into *hard blocks*, the plugin ships a copyable **PreToolUse guard
+template**, [`plugins/harness/hooks/templates/pretooluse-guard.sh.template`](plugins/harness/hooks/templates/pretooluse-guard.sh.template).
+It demonstrates blocking dangerous Bash (`rm -rf`, `git push --force`, `git reset --hard`), writes to
+`.env*` secret files, and an off-limits MCP/service reference (a clearly-marked placeholder you fill in).
+
+It is **not** active by default — it is deliberately **not** registered in the plugin's `hooks.json`, so a
+sharp guard never runs unreviewed in every repo. You activate it per-repo, on purpose:
+
+```sh
+# Copy the template out of the harness plugin (your marketplace clone, e.g. under ~/.claude/plugins/…)
+# into your repo — replace <harness> with that location:
+cp <harness>/hooks/templates/pretooluse-guard.sh.template .claude/hooks/pretooluse-guard.sh
+chmod +x .claude/hooks/pretooluse-guard.sh
+# then replace each __REPLACE_ME_* placeholder with your repo's real off-limits refs (or delete that block)
+```
+
+Register it in `.claude/settings.json` (an **empty** `matcher` fires on *all* tools, so the guard also
+sees MCP calls):
+
+```json
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "",
+        "hooks": [
+          { "type": "command", "command": "bash \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/pretooluse-guard.sh" }
+        ]
+      }
+    ]
+  }
+}
+```
+
+A blocked call returns the documented `permissionDecision: "deny"` and a visible `harness guard: blocked — …`
+audit line. The guard fail-**safes** (it exits 0 with no decision when it can't positively identify a
+blocked pattern, so your normal permission flow still applies) and is bash-3.2-portable. Opt-out for one
+session: `HARNESS_GUARD=off`.
+
 ## Quality & releases
 
 After `bash scripts/setup.sh` (once per clone), a local quality gate runs on every commit (pre-commit
