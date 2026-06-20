@@ -82,6 +82,25 @@ with:
 
 Decider: _would this break on a Swift / Python / Go repo?_ If yes, it is per-repo and never lives in the plugin.
 
+## Adopt it in a new repo
+
+The plugin (Layer 1) is generic; your repo supplies the stack adapter (Layer 2). Copyable, stack-neutral
+starting points live in [`docs/templates/`](docs/templates/) — fill the marked `<SLOT>`s:
+
+1. **Enable the plugin.** Add the bootstrap to `.claude/settings.json` (`extraKnownMarketplaces` +
+   `enabledPlugins` + `autoUpdate`) — see [Install](#install). Pick `autoUpdate` by privilege:
+   [`docs/VERSIONING.md`](docs/VERSIONING.md) (default `false` for repos with secrets/MCP/CI).
+2. **Write your `CLAUDE.md`.** Copy [`docs/templates/consumer-CLAUDE.md.template`](docs/templates/consumer-CLAUDE.md.template)
+   to your repo's `CLAUDE.md` and fill in the stack/commands, conventions, and any **per-repo additions** to
+   the universal *Risk & Approval* and *Definition of Done*. The generic `test-runner` / `code-reviewer`
+   read this file to learn your gate — so keep the commands accurate.
+3. **Wire a local pre-push gate** (no CI compute imposed on you). Either
+   [`docs/templates/lefthook.yml.example`](docs/templates/lefthook.yml.example) (recommended; a single Go
+   binary, language-agnostic) **or** the zero-dependency
+   [`docs/templates/githooks-pre-push.example`](docs/templates/githooks-pre-push.example)
+   (`git config core.hooksPath .githooks`).
+4. **(Optional) Activate the PreToolUse guard** to hard-block your sharp, project-specific cases — see below.
+
 ## Per-repo enforcement (optional): the PreToolUse guard
 
 The universal *Risk & Approval* floor (in [CLAUDE.md](CLAUDE.md)) is a behavioural contract. To turn the
