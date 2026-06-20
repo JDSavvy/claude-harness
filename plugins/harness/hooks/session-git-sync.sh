@@ -55,7 +55,10 @@ if [ -z "$DIRTY" ] && [ "$AHEAD" = "0" ] && [ "$BEHIND" -gt 0 ] && [ "${HARNESS_
   OLD="$(git rev-parse --short HEAD 2>/dev/null)"
   if git merge --ff-only --quiet "$UPSTREAM" 2>/dev/null; then
     NEW="$(git rev-parse --short HEAD 2>/dev/null)"
-    emit_context "✅ harness git-sync: fast-forwarded $BRANCH by +$BEHIND ($OLD→$NEW) from $UPSTREAM (tree was clean & behind). HEAD moved — re-read files if cached."
+    # Brace-delimit ${OLD} so the multibyte "→" that follows can't be absorbed into the variable name
+    # by bash 3.2 in a non-UTF-8 (C) locale — which, under `set -u`, would abort the hook ("OLD…:
+    # unbound variable"). Portability bug surfaced by the macOS bash-3.2 CI job.
+    emit_context "✅ harness git-sync: fast-forwarded $BRANCH by +$BEHIND (${OLD}→${NEW}) from $UPSTREAM (tree was clean & behind). HEAD moved — re-read files if cached."
     exit 0
   fi
 fi

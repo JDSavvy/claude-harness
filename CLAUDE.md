@@ -204,11 +204,15 @@ This is the bar the `/plan-change` skill plans toward and that `/finish-pr` driv
 ## Quality gate
 
 `bash scripts/validate.sh` checks: JSON manifests parse · version is single-sourced · `bash -n` on every
-hook · `shellcheck` (if installed) · `claude plugin validate` (if installed) · skill/agent frontmatter ·
-`hooks.json` referential integrity · every `tests/*.test.sh`. It runs in **two places, identically**: as a
-local git **pre-commit** (via `.githooks/`) and in **CI on every push/PR** (free for this public repo, so
-a contributor who skips the local hook still can't merge a red gate). **Enable the local hook once per
-clone:**
+hook + `*.sh.template` · `shellcheck` (if installed) · `claude plugin validate` (if installed) ·
+skill/agent frontmatter · `hooks.json` referential integrity · **consumption wiring** (the marketplace
+entry resolves to a real plugin dir whose `plugin.json` name matches and that ships a `hooks.json` — the
+no-CLI static proxy for "a consumer can load this plugin") · every `tests/*.test.sh`. It runs in **three
+places, identically**: as a local git **pre-commit** (via `.githooks/`) and in **CI on every push/PR on
+both Linux and macOS** — the macOS job runs the gate under the system **bash 3.2.57** (`/bin/bash`), the
+floor the hooks must stay portable to, so a bash-4-ism can't reach consumers. All free for this public
+repo, so a contributor who skips the local hook still can't merge a red gate. **Enable the local hook once
+per clone:**
 
 ```
 bash scripts/setup.sh            # or: git config core.hooksPath .githooks

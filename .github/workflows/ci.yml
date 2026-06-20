@@ -1,6 +1,10 @@
-# Mirrors the LOCAL pre-commit gate exactly: runs the same scripts/validate.sh.
-# shellcheck and python3 are preinstalled on ubuntu-latest; the `claude` CLI is
-# absent and validate.sh skips it gracefully — so no extra setup is needed.
+# Mirrors the LOCAL pre-commit gate exactly: runs the same scripts/validate.sh on two platforms.
+#   - validate (ubuntu): shellcheck + python3 preinstalled; the canonical Linux gate.
+#   - validate (macOS bash 3.2): runs the gate under the macOS system bash 3.2.57 — the floor the
+#     harness's hooks must stay portable to — so a bash-4-ism can't reach consumers undetected.
+# The `claude` CLI is absent on both runners and validate.sh skips it gracefully; its static
+# consumption-wiring + hooks.json-reference checks run everywhere, so plugin loadability is still gated.
+# Free on this public repo (standard runners, incl. macOS, are unlimited) — zero cost imposed on consumers.
 name: CI
 
 on:
@@ -18,3 +22,16 @@ jobs:
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - run: bash scripts/validate.sh
+
+  validate-macos:
+    name: validate (macOS bash 3.2)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Show macOS system bash version
+        run: /bin/bash --version | head -1
+      - name: Run the gate under macOS system bash 3.2
+        # Prepend /bin so every `bash` — including validate.sh's own `bash <test>` invocations —
+        # resolves to /bin/bash (3.2.57), not a Homebrew bash 5 that might be ahead on PATH. python3
+        # stays reachable via the rest of PATH; shellcheck/claude are absent and skip gracefully.
+        run: PATH="/bin:$PATH" /bin/bash scripts/validate.sh
