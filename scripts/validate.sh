@@ -35,14 +35,16 @@ else
   no "version duplicated in marketplace.json — remove it (plugin.json wins)"
 fi
 
-# 3) bash syntax for every hook + lib script.
+# 3) bash syntax for every hook + lib script + copyable *.sh.template (templates aren't *.sh, so
+#    they'd otherwise dodge the gate; a syntax-broken template would mislead every consumer).
 while IFS= read -r s; do
   if bash -n "$s" 2>/dev/null; then ok "bash -n — ${s#plugins/harness/}"; else no "bash syntax — $s"; fi
-done < <(find plugins/harness/hooks -name '*.sh' | sort)
+done < <(find plugins/harness/hooks \( -name '*.sh' -o -name '*.sh.template' \) | sort)
 
-# 4) shellcheck (if installed).
+# 4) shellcheck (if installed) — hooks, lib, and the templates.
 if command -v shellcheck >/dev/null 2>&1; then
-  if shellcheck -S warning -x plugins/harness/hooks/*.sh plugins/harness/hooks/lib/*.sh 2>/dev/null; then
+  # shellcheck disable=SC2046  # intentional word-split: repo-controlled paths, no spaces
+  if shellcheck -S warning -x $(find plugins/harness/hooks \( -name '*.sh' -o -name '*.sh.template' \) | sort) 2>/dev/null; then
     ok "shellcheck"
   else
     no "shellcheck reported issues"
