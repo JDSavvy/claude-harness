@@ -30,6 +30,11 @@ jobs:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: Show macOS system bash version
         run: /bin/bash --version | head -1
+      - name: DEBUG git-sync test
+        run: |
+          /bin/bash --version | head -1
+          git --version
+          PATH="/bin:$PATH" /bin/bash tests/git-sync.test.sh || true
       - name: Run the gate under macOS system bash 3.2
         # Prepend /bin so every `bash` — including validate.sh's own `bash <test>` invocations —
         # resolves to /bin/bash (3.2.57), not a Homebrew bash 5 that might be ahead on PATH. python3
