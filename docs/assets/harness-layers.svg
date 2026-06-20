@@ -24,7 +24,7 @@
     <text x="71" y="16.5" text-anchor="middle" class="chip" font-size="12" fill="#bd5733">stack-agnostic ✓</text>
   </g>
   <text x="48" y="130" class="body" font-size="12.8"><tspan class="chip" fill="#1f2328">Skills</tspan>  <tspan class="mono">/plan-change · /create-issue · /finish-pr</tspan></text>
-  <text x="48" y="149" class="body" font-size="12.8"><tspan class="chip" fill="#1f2328">Subagents</tspan> <tspan class="mono">code-reviewer · test-runner</tspan>    <tspan class="chip" fill="#1f2328">Hooks</tspan> <tspan class="mono">git-sync · update-check · anti-hallucination</tspan></text>
+  <text x="48" y="149" class="body" font-size="12.8"><tspan class="chip" fill="#1f2328">Subagents</tspan> <tspan class="mono">code-reviewer · test-runner</tspan><tspan class="chip" fill="#1f2328" dx="26">Hooks</tspan> <tspan class="mono">git-sync · update-check · anti-hallucination</tspan></text>
 
   <!-- connector -->
   <g stroke="#9aa5b1" stroke-width="1.6" fill="none">
@@ -43,7 +43,7 @@
     <rect width="142" height="24" rx="12" fill="#f6f8fa" stroke="#d8dee4" stroke-width="1.2"/>
     <text x="71" y="16.5" text-anchor="middle" class="chip" font-size="12" fill="#57606a">stack-specific</text>
   </g>
-  <text x="48" y="266" class="body" font-size="12.8"><tspan class="chip" fill="#1f2328">Gate</tspan> formatter · linter · build/test commands    <tspan class="chip" fill="#1f2328">Project</tspan> skills &amp; guards</text>
+  <text x="48" y="266" class="body" font-size="12.8"><tspan class="chip" fill="#1f2328">Gate</tspan> formatter · linter · build/test commands<tspan class="chip" fill="#1f2328" dx="26">Project</tspan> skills &amp; guards</text>
   <text x="48" y="285" class="body" font-size="12.8">the project's own <tspan class="mono">CLAUDE.md</tspan> + <tspan class="mono">.claude/settings.json</tspan> bootstrap · a local pre-push gate</text>
 
   <!-- decider -->
