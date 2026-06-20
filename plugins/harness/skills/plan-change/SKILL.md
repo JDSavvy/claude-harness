@@ -68,8 +68,9 @@ context is missing, say so and **stop-and-flag** rather than plan on a guess.
 
 ### 6. Delivery path
 Say whether/when a **branch, commit, issue, PR, or review** is needed for this change, and point at the
-**Definition of Done** the implementation must satisfy (repo gate green, tests that bite, conventional
-commit, docs updated where needed, no secret leak, acceptance criteria verified).
+**universal Definition of Done** the implementation must satisfy and verify: repo gate green, tests that
+bite, conventional commit, docs updated where needed, no secret leak, acceptance criteria met **and
+checked** (plus any stricter per-repo criteria in the repo's `CLAUDE.md`).
 
 ## Output — the plan artifact
 

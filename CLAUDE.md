@@ -157,6 +157,26 @@ registering it as a **PreToolUse** hook (or by using a pre-push gate) — keepin
 (Layer 2) while the floor here stays universal (Layer 1). The template is deliberately **not** registered
 in the plugin's `hooks.json`, so nothing hard-blocks in a consumer until they activate it on purpose.
 
+## Definition of Done (universal)
+
+A change is **done** only when all of these hold — in **every** repo, whatever the stack. The agent
+**verifies** each (runs it, reads it); it never just asserts it:
+
+- **The repo's own quality gate is green** — lint + typecheck/build + tests, exactly as that repo's
+  `CLAUDE.md` / package scripts / CI define them (discover the commands; don't hardcode them).
+- **Tests exist and bite for the new logic** — added/updated per the repo's conventions, and they would
+  actually **fail** if the change regressed. Confirm they run and cover the change; never weaken, skip, or
+  delete a test to go green — fix the cause.
+- **Conventional Commit** — the message drives versioning/changelog; use the right type/scope.
+- **Docs updated where needed** — user-facing or contract-relevant changes carry their doc update (in this
+  repo, `CHANGELOG.md`/version are release-please-automated — don't hand-edit them).
+- **No secret leak** — no credential/token/key committed, logged, or client-exposed (see *Risk & Approval*).
+- **Acceptance criteria met and verified** — every stated criterion is satisfied **and checked** against the
+  live source of truth, not assumed (anti-hallucination).
+
+This is the bar the `/plan-change` skill plans toward and that `/finish-pr` drives a PR to. A consumer may
+**add** stricter per-repo criteria in its own `.claude/` `CLAUDE.md`; it never drops these.
+
 ## How to extend
 
 - **New skill:** `plugins/harness/skills/<name>/SKILL.md` (frontmatter `name` + `description`). Keep it generic.
