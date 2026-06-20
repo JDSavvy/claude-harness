@@ -100,7 +100,10 @@ so the harness stays **truly framework-independent** (Swift, Next.js, Python, Go
    to the marketplace entry — Claude Code lets `plugin.json` win and the two silently drift.
 3. **Hooks must be safe in every repo:** offline-safe, worktree-safe, fast, **always `exit 0`**, never
    mutate state except the documented `merge --ff-only` path, and offer an opt-out env var. Portable to
-   macOS **bash 3.2** (no `timeout`/`gtimeout`, no `jq`).
+   macOS **bash 3.2** (no `timeout`/`gtimeout`, no `jq`, no GNU-only sed like `\|`). **Brace-delimit any
+   variable immediately followed by a non-ASCII byte** — `"${x}→"`, never `"$x→"`: bash 3.2 in a UTF-8
+   locale absorbs the multibyte char's lead byte into the variable name and aborts under `set -u`. The
+   gate enforces this (`validate.sh` rejects a bare `$VAR` before a multibyte byte in any hook/template).
 4. **Validate before commit.** Run `bash scripts/validate.sh` (wired as a pre-commit hook — see below).
    Never commit a hook that fails the gate; it breaks every repo.
 5. **Lean / scope-fence.** Add only what genuinely serves every repo. **No GitHub CI compute is imposed on
@@ -205,9 +208,11 @@ This is the bar the `/plan-change` skill plans toward and that `/finish-pr` driv
 
 `bash scripts/validate.sh` checks: JSON manifests parse · version is single-sourced · `bash -n` on every
 hook + `*.sh.template` · `shellcheck` (if installed) · `claude plugin validate` (if installed) ·
-skill/agent frontmatter · `hooks.json` referential integrity · **consumption wiring** (the marketplace
-entry resolves to a real plugin dir whose `plugin.json` name matches and that ships a `hooks.json` — the
-no-CLI static proxy for "a consumer can load this plugin") · every `tests/*.test.sh`. It runs in **three
+skill/agent frontmatter (rejecting an empty/quoted-empty `description`) · `hooks.json` referential
+integrity · **consumption wiring** (the marketplace entry resolves to a real plugin dir whose
+`plugin.json` name matches and that ships a `hooks.json` — the no-CLI static proxy for "a consumer can
+load this plugin") · **bash-3.2 multibyte-safe interpolation** (no bare `$VAR` before a non-ASCII byte) ·
+every `tests/*.test.sh`. It runs in **three
 places, identically**: as a local git **pre-commit** (via `.githooks/`) and in **CI on every push/PR on
 both Linux and macOS** — the macOS job runs the gate under the system **bash 3.2.57** (`/bin/bash`), the
 floor the hooks must stay portable to, so a bash-4-ism can't reach consumers. All free for this public

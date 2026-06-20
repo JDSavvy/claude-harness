@@ -90,8 +90,10 @@ def has(key):
         if not m:
             continue
         val = m.group(1).strip()
+        if len(val) >= 2 and val[0] == val[-1] and val[0] in ("'", '"'):
+            val = val[1:-1].strip()  # a quoted inline value: "" / "   " is semantically empty
         if val and val not in (">", ">-", ">+", "|", "|-", "|+"):
-            return True  # inline value
+            return True  # non-empty inline value
         for nl in lines[i + 1:]:        # block scalar / empty inline -> need an indented continuation
             if nl.strip() == "":
                 continue
@@ -163,6 +165,29 @@ except Exception as e:
 PY
 )"
 if [ -z "$wiring" ]; then ok "consumption wiring (marketplace → plugin name + path + hooks.json)"; else no "consumption wiring — $wiring"; fi
+
+# 10) bash-3.2 multibyte-safe interpolation: a bare `$VAR` immediately followed by a multibyte (non-ASCII)
+#     byte — e.g. `$OLD→` — makes bash 3.2 in a UTF-8 locale absorb the char's lead byte into the variable
+#     name and abort under `set -u`. Brace-delimit it (`${OLD}→`). This caught a real git-sync regression;
+#     enforce it deterministically (locale-independent, every platform) so no future hook reintroduces it.
+mb="$(python3 - <<'PY' 2>&1
+import re, glob
+pat = re.compile(r"\$[A-Za-z_][A-Za-z0-9_]*")  # a BARE var ref (no braces)
+hits = []
+for f in sorted(glob.glob("plugins/harness/hooks/**/*.sh", recursive=True) +
+                glob.glob("plugins/harness/hooks/**/*.sh.template", recursive=True)):
+    for ln, line in enumerate(open(f, encoding="utf-8"), 1):
+        for m in pat.finditer(line):
+            nxt = line[m.end():m.end() + 1]
+            if nxt and ord(nxt) > 127:
+                hits.append("%s:%d  %s%s" % (f, ln, m.group(0), nxt))
+print("\n".join(hits))
+PY
+)"
+if [ -z "$mb" ]; then ok "bash-3.2 multibyte-safe interpolation (no bare \$VAR before a non-ASCII byte)"; else
+  no "unbraced \$VAR before a multibyte char (brace-delimit it):"
+  printf '%s\n' "$mb" | while IFS= read -r h; do [ -n "$h" ] && printf '      %s\n' "$h"; done
+fi
 
 if [ "$fail" -eq 0 ]; then
   printf '\033[32mvalidate: ALL GREEN\033[0m\n'
