@@ -4,6 +4,15 @@ All notable changes to the `harness` plugin. Versions track
 `plugins/harness/.claude-plugin/plugin.json` (the single source of truth). Loosely follows
 [Keep a Changelog]; the repo uses Conventional Commits.
 
+## [2.1.0](https://github.com/JDSavvy/claude-harness/compare/harness-v2.0.0...harness-v2.1.0) (2026-06-20)
+
+
+### Features
+
+* **hooks:** add copyable PreToolUse guard template + gate it ([#20](https://github.com/JDSavvy/claude-harness/issues/20)) ([fc0adad](https://github.com/JDSavvy/claude-harness/commit/fc0adadd534584de444713c0ae47bcae8938d263))
+* **hooks:** enrich git-sync fast-forward audit line + document the audit-trail norm ([#25](https://github.com/JDSavvy/claude-harness/issues/25)) ([9233884](https://github.com/JDSavvy/claude-harness/commit/9233884a801490407166d4e28e70cda47f45c97f))
+* **skills:** add /plan-change skill (plan-only artifact) ([#17](https://github.com/JDSavvy/claude-harness/issues/17)) ([d99544e](https://github.com/JDSavvy/claude-harness/commit/d99544ec652785c7805ccdf4e07e58c7abefb769))
+
 ## [2.0.0](https://github.com/JDSavvy/claude-harness/compare/harness-v1.2.0...harness-v2.0.0) (2026-06-18)
 
 A universal-harness overhaul — project-neutral, senior-BP, with free CI and automated releases.
