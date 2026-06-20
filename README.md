@@ -148,8 +148,11 @@ session: `HARNESS_GUARD=off`.
 After `bash scripts/setup.sh` (once per clone), a local quality gate runs on every commit (pre-commit
 via `.githooks/`). The **same** `scripts/validate.sh` runs locally and in this repo's free
 read-only CI: it parses the JSON manifests, checks the version is single-sourced, runs `bash -n` and
-`shellcheck` on the hooks, `claude plugin validate`, skill/agent frontmatter and `hooks.json` reference
-integrity, and every `tests/*.test.sh`. It is Node-free and bypassable with `git commit --no-verify`.
+`shellcheck` on the hooks + templates, `claude plugin validate`, skill/agent frontmatter, `hooks.json`
+reference integrity, the **marketplace → plugin consumption wiring** (a no-CLI proxy for plugin
+loadability), and every `tests/*.test.sh`. CI runs it on **both Linux and macOS** — the macOS job exercises
+the system **bash 3.2.57** path the hooks must stay portable to. It is Node-free and bypassable with
+`git commit --no-verify`.
 
 Releases are automated via **release-please** (Conventional Commits → release PR → on merge, tag +
 GitHub Release). The version is single-sourced in `plugins/harness/.claude-plugin/plugin.json` — never in

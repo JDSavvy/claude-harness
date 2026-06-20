@@ -137,6 +137,33 @@ print("\n".join(seen))
 PY
 )
 
+# 9) Consumption wiring (no CLI needed): the static proxy for "does a consumer actually load this
+#    plugin?" — the marketplace entry must point at a real plugin dir whose plugin.json `name` matches
+#    and that ships a hooks.json. The live `claude plugin validate` above is the full check when the CLI
+#    is present; this runs everywhere (CI has no CLI), so a broken marketplace→plugin wiring can't slip by.
+wiring="$(python3 - <<'PY' 2>&1
+import json, os
+try:
+    m = json.load(open(".claude-plugin/marketplace.json"))
+    p = m["plugins"][0]
+    name, path = p.get("name"), p["source"]["path"]
+    errs = []
+    pj = os.path.join(path, ".claude-plugin", "plugin.json")
+    if not os.path.isfile(pj):
+        errs.append("marketplace source.path '%s' has no .claude-plugin/plugin.json" % path)
+    else:
+        d = json.load(open(pj))
+        if d.get("name") != name:
+            errs.append("name mismatch: marketplace '%s' vs plugin.json '%s'" % (name, d.get("name")))
+    if not os.path.isfile(os.path.join(path, "hooks", "hooks.json")):
+        errs.append("plugin '%s' ships no hooks/hooks.json" % path)
+    print("; ".join(errs))
+except Exception as e:
+    print("marketplace.json wrong shape: %s" % e)
+PY
+)"
+if [ -z "$wiring" ]; then ok "consumption wiring (marketplace → plugin name + path + hooks.json)"; else no "consumption wiring — $wiring"; fi
+
 if [ "$fail" -eq 0 ]; then
   printf '\033[32mvalidate: ALL GREEN\033[0m\n'
 else
