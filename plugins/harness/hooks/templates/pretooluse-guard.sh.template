@@ -42,6 +42,11 @@
 #     slip a token past the guard. The tradeoff is conservative: a blocked substring appearing
 #     anywhere in the tool input over-blocks (fail-LOUD, the safe direction). The `.env` file check
 #     uses the extracted file_path (paths don't carry escaped quotes). Harden for your threat model.
+#   - The patterns are ILLUSTRATIVE substring globs, not a shell parser: they catch the common forms
+#     (rm -rf / -fr / -Rf / -r -f / --recursive; git push --force / -f / +refspec) but not every
+#     permutation (e.g. env-prefixed, `find -delete`), and can over-block when the text appears elsewhere
+#     in the payload (e.g. `terraform -r` contains `rm -r`; `git push … && grep -f x` trips the `-f` arm).
+#     That's the safe direction for a template — tighten to real command boundaries for your repo.
 #   - Opt-out for one session: HARNESS_GUARD=off
 # ============================================================================================
 set -u
@@ -62,7 +67,9 @@ json_string_field() {
 # deny <reason> -> hard-block via the documented PreToolUse decision, plus a visible audit line.
 # (Alternative: print the reason to stderr and `exit 2` — simpler, but no structured reason.)
 deny() {
-  reason="$1"
+  # Strip control bytes first (a crafted tool_name/command could carry a tab/CR that would otherwise
+  # break the emitted JSON, and a strict runner might then drop the block), then escape \ and ".
+  reason="$(printf '%s' "$1" | tr -d '\001-\037')"
   esc="${reason//\\/\\\\}"
   esc="${esc//\"/\\\"}"
   printf '{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"%s"}}\n' "$esc"
@@ -78,8 +85,8 @@ FILE="$(json_string_field file_path)"
 case "$TOOL" in
 Bash)
   case "$PAYLOAD" in
-  *"rm -rf"* | *"rm -fr"*) deny "destructive 'rm -rf' blocked by guard" ;;
-  *"git push"*"--force"*) deny "force-push blocked by guard (never on a shared branch; use --force-with-lease only when truly unavoidable)" ;;
+  *"rm -rf"* | *"rm -fr"* | *"rm -Rf"* | *"rm -fR"* | *"rm -r -f"* | *"rm -f -r"* | *"rm --recursive"*) deny "destructive recursive 'rm' blocked by guard" ;;
+  *"git push"*"--force"* | *"git push"*" -f"* | *"git push"*" +"*) deny "force-push blocked by guard (--force / -f / +refspec; never on a shared branch — use --force-with-lease only when truly unavoidable)" ;;
   *"git reset --hard"*) deny "'git reset --hard' blocked by guard (discards work / can rewrite a shared branch) — narrow this rule for your repo if needed" ;;
   *">"*.env*) deny "writing a .env secret file via shell redirect is blocked by guard" ;;
   esac
