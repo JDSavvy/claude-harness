@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 250" role="img" aria-label="The harness workflow: orient, plan, implement, validate, ship — one pattern in any stack repo">
+  <defs>
+    <style>
+      .card { fill:#ffffff; stroke:#d8dee4; stroke-width:1.4; }
+      .ttl  { font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif; font-weight:700; fill:#1f2328; }
+      .sub  { font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif; fill:#57606a; }
+      .mono { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; fill:#bd5733; }
+      .num  { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-weight:700; fill:#ffffff; }
+    </style>
+  </defs>
+
+  <rect x="2" y="2" width="896" height="246" rx="18" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text x="30" y="40" class="ttl" font-size="18">From a request to a PR — one workflow, in any stack repo</text>
+
+  <!-- arrows between the five steps (drawn first, behind cards) -->
+  <g stroke="#e2805f" stroke-width="2.4" fill="none" stroke-linecap="round">
+    <path d="M191 137 h22"/><path d="M207 130 l8 7 -8 7"/>
+    <path d="M365 137 h22"/><path d="M381 130 l8 7 -8 7"/>
+    <path d="M539 137 h22"/><path d="M555 130 l8 7 -8 7"/>
+    <path d="M713 137 h22"/><path d="M729 130 l8 7 -8 7"/>
+  </g>
+
+  <!-- step cards -->
+  <g>
+    <!-- 1 Orient -->
+    <rect class="card" x="26" y="74" width="150" height="120" rx="13"/>
+    <circle cx="50" cy="100" r="13" fill="#bd5733"/><text x="50" y="105" text-anchor="middle" class="num" font-size="14">1</text>
+    <text x="72" y="105" class="ttl" font-size="15.5">Orient</text>
+    <text x="42" y="134" class="sub" font-size="11.8">Read the repo's</text>
+    <text x="42" y="150" class="sub" font-size="11.8">CLAUDE.md; reuse</text>
+    <text x="42" y="166" class="sub" font-size="11.8">existing skills/hooks.</text>
+
+    <!-- 2 Plan -->
+    <rect class="card" x="200" y="74" width="150" height="120" rx="13"/>
+    <circle cx="224" cy="100" r="13" fill="#bd5733"/><text x="224" y="105" text-anchor="middle" class="num" font-size="14">2</text>
+    <text x="246" y="105" class="ttl" font-size="15.5">Plan</text>
+    <text x="216" y="132" class="mono" font-size="12.5">/plan-change</text>
+    <text x="216" y="152" class="sub" font-size="11.8">A plan-only</text>
+    <text x="216" y="168" class="sub" font-size="11.8">artifact — no code.</text>
+
+    <!-- 3 Implement -->
+    <rect class="card" x="374" y="74" width="150" height="120" rx="13"/>
+    <circle cx="398" cy="100" r="13" fill="#bd5733"/><text x="398" y="105" text-anchor="middle" class="num" font-size="14">3</text>
+    <text x="420" y="105" class="ttl" font-size="15.5">Implement</text>
+    <text x="390" y="134" class="sub" font-size="11.8">Make the change,</text>
+    <text x="390" y="150" class="sub" font-size="11.8">within the contract's</text>
+    <text x="390" y="166" class="sub" font-size="11.8">risk &amp; approval rules.</text>
+
+    <!-- 4 Validate -->
+    <rect class="card" x="548" y="74" width="150" height="120" rx="13"/>
+    <circle cx="572" cy="100" r="13" fill="#bd5733"/><text x="572" y="105" text-anchor="middle" class="num" font-size="14">4</text>
+    <text x="594" y="105" class="ttl" font-size="15.5">Validate</text>
+    <text x="564" y="132" class="sub" font-size="11.8">Run the repo's gate</text>
+    <text x="564" y="148" class="sub" font-size="11.8">via the generic</text>
+    <text x="564" y="166" class="mono" font-size="12.5">test-runner</text>
+
+    <!-- 5 Ship -->
+    <rect class="card" x="722" y="74" width="150" height="120" rx="13"/>
+    <circle cx="746" cy="100" r="13" fill="#bd5733"/><text x="746" y="105" text-anchor="middle" class="num" font-size="14">5</text>
+    <text x="768" y="105" class="ttl" font-size="15.5">Ship</text>
+    <text x="738" y="132" class="mono" font-size="12.5">/finish-pr</text>
+    <text x="738" y="152" class="sub" font-size="11.8">Reconcile drift,</text>
+    <text x="738" y="168" class="sub" font-size="11.8">verify, push once.</text>
+  </g>
+
+  <text x="30" y="226" class="sub" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="12.5" fill="#6e7781">Same names, same flow everywhere — the stack-specific commands come from each repo's own <tspan class="mono" font-size="12.5">CLAUDE.md</tspan>.</text>
+</svg>
