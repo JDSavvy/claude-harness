@@ -205,7 +205,7 @@
         </p>
         <p class="meta">
           github.com/JDSavvy/claude-harness · Claude-Code-only · prepared
-          2026-06-15
+          2026-06-20
         </p>
       </header>
 
@@ -374,8 +374,8 @@
             fill="#fff"
             stroke="#e2e8f0"
           />
-          <text x="92" y="333" font-size="11.5" fill="#334155">
-            Skills: /create-issue · /finish-pr
+          <text x="92" y="333" font-size="10.5" fill="#334155">
+            Skills: /plan-change · /create-issue · /finish-pr
           </text>
           <rect
             x="392"
@@ -498,8 +498,9 @@
       <pre><code>/plugin marketplace add https://github.com/JDSavvy/claude-harness.git
 /plugin install harness@claude-harness</code></pre>
       <p>
-        Now every project on that machine has <code>/create-issue</code>, the
-        agents, and the hooks.
+        Now every project on that machine has <code>/plan-change</code>,
+        <code>/create-issue</code>, <code>/finish-pr</code>, the agents, and the
+        hooks (skills are invoked namespaced, e.g. <code>/harness:plan-change</code>).
       </p>
 
       <h3>B) Repo-committed bootstrap (recommended)</h3>
@@ -508,7 +509,7 @@
   "extraKnownMarketplaces": {
     "claude-harness": {
       "source": { "source": "git", "url": "https://github.com/JDSavvy/claude-harness.git" },
-      "autoUpdate": true
+      "autoUpdate": false
     }
   },
   "enabledPlugins": { "harness@claude-harness": true }
@@ -524,8 +525,10 @@
       <h2 class="avoid-break"><span class="n">5</span> Updates</h2>
       <ul>
         <li>
-          <strong>Automatic:</strong> <code>autoUpdate: true</code> → Claude
-          Code refreshes the local clone + plugin at session startup.
+          <strong>Automatic (low-privilege only):</strong>
+          <code>autoUpdate: true</code> → Claude Code refreshes the local clone +
+          plugin at session startup (runs new code before review — keep it
+          <code>false</code> for any repo with secrets/tokens/MCP/CI).
         </li>
         <li>
           <strong>Manual:</strong>
@@ -548,7 +551,8 @@
         </tr>
         <tr>
           <td>
-            <code>/create-issue</code>, <code>/finish-pr</code><br />
+            <code>/plan-change</code>, <code>/create-issue</code>,
+            <code>/finish-pr</code><br />
             generic <code>code-reviewer</code>, <code>test-runner</code><br />
             SessionStart hooks (git-sync, update-check, anti-hallucination)
           </td>
@@ -587,7 +591,7 @@
 
       <footer>
         <span>claude-harness — shared Claude Code harness</span>
-        <span>Claude-Code-only · 2026-06-15</span>
+        <span>Claude-Code-only · 2026-06-20</span>
       </footer>
     </div>
   </body>

@@ -35,17 +35,19 @@ install on folder-trust:
         "source": "git",
         "url": "https://github.com/JDSavvy/claude-harness.git"
       },
-      "autoUpdate": true
+      "autoUpdate": false
     }
   },
   "enabledPlugins": { "harness@claude-harness": true }
 }
 ```
 
-> `autoUpdate: true` refreshes the marketplace and plugin from the mutable `main` branch at every session
-> start — each start runs whatever `main` currently is (including its SessionStart hooks) before you can
-> review it. For higher-privileged consumers, especially CI runners holding tokens, prefer
-> `autoUpdate: false` and update deliberately via `/plugin marketplace update claude-harness`.
+> The snippet defaults to **`autoUpdate: false`** — the **safe default**: you pin the installed version and
+> update deliberately, after review, via `/plugin marketplace update claude-harness`. With `autoUpdate: true`
+> each session start refreshes the marketplace and plugin from the mutable `main` branch and **runs whatever
+> `main` currently is — including its SessionStart hooks — before you can review it**. Set `true` **only** for
+> a purely-local, low-privilege session where convenience outweighs that supply-chain exposure; keep it
+> `false` for any repo holding secrets/tokens, MCP credentials, or CI privileges.
 > See [`docs/VERSIONING.md`](docs/VERSIONING.md) for the full `autoUpdate` heuristic, the breaking-change
 > definition, and the per-major migration policy.
 
@@ -70,6 +72,9 @@ with:
 | `session-git-sync`             | Bounded fetch + ahead/behind/dirty notify; safe `git merge --ff-only` only when clean & strictly behind, with a forensic audit line (`+N` and `old→new` HEAD) on the fast-forward | `HARNESS_GIT_SYNC=off`   |
 | `harness-update-check`         | Throttled (~daily) `ls-remote` check; notifies (never auto-updates) when the plugin is behind             | `HARNESS_UPDATE_CHECK=off` |
 | `anti-hallucination-reminder`  | Injects the universal "verify before asserting, incl. negative claims" rule into every session            | `HARNESS_AH_REMINDER=off`  |
+
+> Plugin skills are namespaced — invoke them as **`/harness:<name>`** (e.g. `/harness:plan-change`,
+> `/harness:create-issue`, `/harness:finish-pr`). The bare `/name` forms above are shorthand.
 
 ## Shared vs per-repo
 
