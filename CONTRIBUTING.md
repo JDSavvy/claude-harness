@@ -63,6 +63,11 @@ session start.
 
 Never set `version` in `marketplace.json` — `plugin.json` wins and the two would silently drift.
 
+For a **major** (`feat!` / `BREAKING CHANGE:`), follow [`docs/VERSIONING.md`](docs/VERSIONING.md): it defines
+what counts as breaking, the **deprecate-before-remove** rule, and the requirement to ship a migration guide
+(write it from [`docs/templates/MIGRATION-GUIDE.template.md`](docs/templates/MIGRATION-GUIDE.template.md) as
+`docs/migrations/v<MAJOR>.md`). That doc also holds the consumer `autoUpdate` heuristic.
+
 ---
 
 Questions or contract disagreements: resolve them by editing the relevant section of `CLAUDE.md` in a PR
