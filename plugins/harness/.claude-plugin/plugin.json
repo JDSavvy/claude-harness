@@ -1,7 +1,7 @@
 {
   "name": "harness",
   "description": "Canonical, stack-agnostic Claude Code harness: the /plan-change skill (orient & plan a change before building it), the /create-issue skill (goal → researched GitHub issue) and the /finish-pr skill (drive a PR to merge-ready — reconcile against drift, then implement & fix it), plus generic code-reviewer and test-runner subagents and SessionStart automation. Reusable across any repo; each project tailors its stack-specific bits (build/test commands, project guards, app skills) locally.",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "author": {
     "name": "JDSavvy",
     "email": "jdsavvy@proton.me"
