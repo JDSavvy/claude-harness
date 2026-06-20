@@ -44,6 +44,13 @@ blocks '{"tool_name":"Bash","tool_input":{"command":"git push origin main --forc
 blocks '{"tool_name":"Bash","tool_input":{"command":"git push --force-with-lease"}}' "git push --force-with-lease"
 blocks '{"tool_name":"Bash","tool_input":{"command":"git reset --hard origin/main"}}' "git reset --hard"
 
+# --- regression: a JSON-escaped quote BEFORE the dangerous token must NOT slip past the guard.
+#     A naive field extractor truncates the command at the first \" and misses the danger; the
+#     raw-payload scan catches it. (These payloads carry an escaped \" earlier in the command.) ---
+blocks '{"tool_name":"Bash","tool_input":{"command":"cd \"/my project\" && rm -rf node_modules"}}' "rm -rf after a quoted arg"
+blocks '{"tool_name":"Bash","tool_input":{"command":"git add -A && git commit -m \"wip\" && git push --force-with-lease"}}' "force-push after a quoted -m"
+blocks '{"tool_name":"Bash","tool_input":{"command":"echo \"go\"; git reset --hard HEAD~5"}}' "reset --hard after a quoted echo"
+
 # --- (2) secret-path writes are blocked ---
 blocks '{"tool_name":"Edit","tool_input":{"file_path":"/repo/.env"}}' "edit .env"
 blocks '{"tool_name":"Write","tool_input":{"file_path":"config/.env.production"}}' "write .env.production"
@@ -78,6 +85,8 @@ out="$(run "$FILLED" '{"tool_name":"mcp__prod_db__query","tool_input":{"q":"x"}}
 contains '"permissionDecision":"deny"' "$out" "filled placeholder blocks off-limits MCP tool"
 out="$(run "$FILLED" '{"tool_name":"Bash","tool_input":{"command":"kubectl --context prod-cluster delete ns x"}}')"
 contains '"permissionDecision":"deny"' "$out" "filled placeholder blocks off-limits ref in bash"
+out="$(run "$FILLED" '{"tool_name":"Bash","tool_input":{"command":"echo \"go\"; kubectl --context prod-cluster delete ns x"}}')"
+contains '"permissionDecision":"deny"' "$out" "filled placeholder blocks off-limits ref after a quoted arg"
 
 if [ "$fails" -eq 0 ]; then
   echo "pretooluse-guard.test.sh: PASS"

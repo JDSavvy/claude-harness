@@ -43,8 +43,11 @@ done < <(find plugins/harness/hooks \( -name '*.sh' -o -name '*.sh.template' \) 
 
 # 4) shellcheck (if installed) — hooks, lib, and the templates.
 if command -v shellcheck >/dev/null 2>&1; then
-  # shellcheck disable=SC2046  # intentional word-split: repo-controlled paths, no spaces
-  if shellcheck -S warning -x $(find plugins/harness/hooks \( -name '*.sh' -o -name '*.sh.template' \) | sort) 2>/dev/null; then
+  sc_files="$(find plugins/harness/hooks \( -name '*.sh' -o -name '*.sh.template' \) | sort)"
+  if [ -z "$sc_files" ]; then
+    skip "shellcheck — no hook scripts found" # guard: never run bare `shellcheck` (would read stdin)
+  # shellcheck disable=SC2086  # intentional word-split: repo-controlled paths, no spaces
+  elif shellcheck -S warning -x $sc_files 2>/dev/null; then
     ok "shellcheck"
   else
     no "shellcheck reported issues"

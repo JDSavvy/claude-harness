@@ -155,7 +155,7 @@ turned into **hard local blocks** by copying the stack-neutral
 `plugins/harness/hooks/templates/pretooluse-guard.sh.template` into the consumer's `.claude/hooks/` and
 registering it as a **PreToolUse** hook (or by using a pre-push gate) — keeping enforcement local
 (Layer 2) while the floor here stays universal (Layer 1). The template is deliberately **not** registered
-in the plugin's `hooks.json`, so nothing hard-blocks in a consumer until they activate it on purpose (P4).
+in the plugin's `hooks.json`, so nothing hard-blocks in a consumer until they activate it on purpose.
 
 ## How to extend
 
@@ -165,7 +165,7 @@ in the plugin's `hooks.json`, so nothing hard-blocks in a consumer until they ac
   opt-out env var + a watchdog if it does I/O, and add a behavior test under `tests/`.
 - **New copyable template:** `plugins/harness/hooks/templates/<name>.sh.template` — a stack-neutral pattern
   consumers copy into their own `.claude/` and activate themselves; **never** register it in the plugin's
-  `hooks.json` (it must not run unreviewed in every consumer — P4). Keep it bash-3.2-portable with an
+  `hooks.json` (it must not run unreviewed in every consumer). Keep it bash-3.2-portable with an
   opt-out env var; the gate `bash -n`s and `shellcheck`s `*.sh.template`, and it needs a behavior test
   under `tests/`.
 - **Releasing is automated and maintainer-only — not a propagated skill.** Land changes via
