@@ -60,6 +60,7 @@ with:
 
 | Element                        | What it does                                                                                              | Opt-out                  |
 | ------------------------------ | --------------------------------------------------------------------------------------------------------- | ------------------------ |
+| `/plan-change`                 | Orient + plan a change in-session (orientation → changes → validation → risk class → delivery) — no code/git | —                        |
 | `/create-issue`                | Turn a goal into a researched, best-practice GitHub issue — no code; ends at the issue                    | —                        |
 | `/finish-pr`                   | Drive a PR to merge-ready: reconcile against drift (merge base, never rebase), implement, verify, push once | —                        |
 | `code-reviewer`                | Opus subagent — reviews correctness, security, performance, reuse                                          | —                        |
@@ -72,7 +73,7 @@ with:
 
 | Shared — this plugin                                                | Per-repo — each project's `.claude/`                                  |
 | ------------------------------------------------------------------- | --------------------------------------------------------------------- |
-| `/create-issue`, `/finish-pr` skills                                | Formatter, linter, dependency install                                 |
+| `/plan-change`, `/create-issue`, `/finish-pr` skills                | Formatter, linter, dependency install                                 |
 | Generic `code-reviewer`, `test-runner` subagents                    | The quality-gate commands (lint / build / test)                       |
 | Generic `SessionStart` hooks (git-sync, update-check, AH reminder)  | Project-specific skills and specialized subagents                     |
 | Pure git/workflow logic, zero stack assumptions                     | The project `CLAUDE.md` and `.claude/settings.json` bootstrap         |

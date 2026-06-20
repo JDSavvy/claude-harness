@@ -9,7 +9,7 @@
   "plugins": [
     {
       "name": "harness",
-      "description": "Canonical, stack-agnostic harness: the /create-issue skill (goal → researched GitHub issue) and the /finish-pr skill (drive a PR to merge-ready — reconcile against drift, then implement & fix it), plus generic code-reviewer and test-runner subagents and SessionStart automation.",
+      "description": "Canonical, stack-agnostic harness: the /plan-change skill (orient & plan a change before building it), the /create-issue skill (goal → researched GitHub issue) and the /finish-pr skill (drive a PR to merge-ready — reconcile against drift, then implement & fix it), plus generic code-reviewer and test-runner subagents and SessionStart automation.",
       "author": { "name": "JDSavvy" },
       "category": "development",
       "source": {
